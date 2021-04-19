@@ -5,8 +5,8 @@ The Super Duck
 
 This one tries to implement some flight, using the mobkit mod.
 In order to fly, it is necessary to first supply the airplane with biofuel.
-Then with a gallon selected, punch it against the trike.
-You can use 10 of them to fill the tank. See the fuel gauge on the airplane
+Then with a bottle or gallon selected, punch it against the trike.
+You can use 10 bottles them to fill the tank. See the fuel gauge on the airplane
 panel (right below, with a green F). To embark, click with the right button.
 While the machine is off, it is possible to move it using the sneak and jump keys (shift an space).
 W ans S controls the pitch (elevator).
@@ -18,7 +18,7 @@ Adjust to the maximum. Pull the elevator control (S) when it have the speed to l
 
 During the cruise flight, it is ideal to keep the power setting below the red range,
 to control fuel consumption. Use the climb indicator to stabilize altitude,
-as at high altitudes you lose support and you spend more fuel. 
+as at high altitudes you lose sustentation and you spend more fuel. 
 
 For landing, just lower the power and stabilize the airplane. Pay attention at air speed
 indicator, keeping it at green range, otherwise you will stall.

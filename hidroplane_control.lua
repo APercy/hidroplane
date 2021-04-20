@@ -43,7 +43,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 		    elseif self._engine_running == false and self._energy > 0 then
 			    self._engine_running = true
 	            -- sound and animation
-                self.sound_handle = minetest.sound_play({name = "engine"},
+                self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
 	                {object = self.object, gain = 2.0, pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32, loop = true,})
                 self.engine:set_animation_frame_speed(60)
 		    end
@@ -67,7 +67,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
                 else
                     --sound
                     minetest.sound_stop(self.sound_handle)
-                    self.sound_handle = minetest.sound_play({name = "engine"},
+                    self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
 	                    {object = self.object, gain = 2.0, pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32, loop = true,})
                 end
             end
@@ -91,7 +91,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
                 else
                     --sound
                     minetest.sound_stop(self.sound_handle)
-                    self.sound_handle = minetest.sound_play({name = "engine"},
+                    self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
 		                {object = self.object, gain = 2.0, pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32, loop = true,})
                 end
             end

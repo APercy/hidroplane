@@ -340,7 +340,7 @@ function hidroplane.testImpact(self, velocity, position)
         local curr_pos = self.object:get_pos()
 
         if self.driver_name then
-            minetest.sound_play("collision", {
+            minetest.sound_play("hidroplane_collision", {
                 to_player = self.driver_name,
                 --pos = curr_pos,
                 --max_hear_distance = 5,

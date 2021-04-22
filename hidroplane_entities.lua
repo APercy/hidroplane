@@ -220,7 +220,7 @@ minetest.register_entity("hidroplane:hidro", {
 	initial_properties = {
 	    physical = true,
         collide_with_objects = true,
-	    collisionbox = {-1.2, -2.31, -1.2, 1.2, 3, 1.2}, --{-1,0,-1, 1,0.3,1},
+	    collisionbox = {-1.2, -2.31, -1.2, 1.2, 1, 1.2}, --{-1,0,-1, 1,0.3,1},
 	    selectionbox = {-2, -2.31, -2, 2, -1, 2},
 	    visual = "mesh",
 	    mesh = "hidroplane_fuselage.b3d",
@@ -239,7 +239,7 @@ minetest.register_entity("hidroplane:hidro", {
     static_save = true,
     infotext = "A nice hidroplane",
     hp_max = 50,
-    buoyancy = 0.18,
+    buoyancy = 0.25,
     physics = hidroplane.physics,
     _passenger = nil,
     _color = "#ffe400",

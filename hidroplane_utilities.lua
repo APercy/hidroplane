@@ -471,7 +471,7 @@ function hidroplane.flightstep(self)
     local stop = false
 
     local curr_pos = self.object:get_pos()
-    self.object:set_pos(curr_pos)
+    --self.object:set_pos(curr_pos)
 
     local node_bellow = mobkit.nodeatpos(mobkit.pos_shift(curr_pos,{y=-3}))
     local is_flying = true
@@ -480,7 +480,7 @@ function hidroplane.flightstep(self)
 
     local is_attached = hidroplane.checkAttach(self, player)
 
-    --ajustar angulo de ataque de acordo com a velocidade atual
+    --ajustar angulo de ataque
     local percentage = math.abs(((longit_speed * 100)/(hidroplane.min_speed + 5))/100)
     if percentage > 1.5 then percentage = 1.5 end
     self._angle_of_attack = self._angle_of_attack - ((self._elevator_angle / 20)*percentage)
@@ -523,7 +523,7 @@ function hidroplane.flightstep(self)
     
     -- new yaw
 	if math.abs(self._rudder_angle)>5 then 
-        local turn_rate = math.rad(24)
+        local turn_rate = math.rad(18)
 		newyaw = yaw + self.dtime*(1 - 1 / (math.abs(longit_speed) + 1)) * self._rudder_angle / 30 * turn_rate * hidroplane.sign(longit_speed)
 	end
 
@@ -533,9 +533,8 @@ function hidroplane.flightstep(self)
 	local snormal = {x=sdir.z,y=0,z=-sdir.x}	-- rightside, dot is negative
 	local prsr = hidroplane.dot(snormal,nhdir)
     local rollfactor = -90
-    local adjust = 20
-    local calibrated_roll_factor = (((longit_speed * 100)/adjust)*rollfactor)/100
-    newroll = (prsr*math.rad(calibrated_roll_factor))*(later_speed)
+    local roll_rate = math.rad(20)
+    newroll = (prsr*math.rad(rollfactor))*(later_speed) * roll_rate * hidroplane.sign(longit_speed)
     --minetest.chat_send_all('newroll: '.. newroll)
     ---------------------------------
     -- end roll
@@ -563,6 +562,8 @@ function hidroplane.flightstep(self)
         self.object:set_velocity({x=0,y=0,z=0})
     end
 
+    self.object:get_luaentity() --hack way to fix jitter on climb
+
     --adjust climb indicator
     local climb_rate = velocity.y * 1.5
     if climb_rate > 5 then climb_rate = 5 end
@@ -587,6 +588,7 @@ function hidroplane.flightstep(self)
     local power_indicator_angle = hidroplane.get_gauge_angle(self._power_lever/10)
     self.power_gauge:set_attach(self.object,'',HIDROPLANE_GAUGE_POWER_POSITION,{x=0,y=0,z=power_indicator_angle})
 
+    --apply rotations
 	if newyaw~=yaw or newpitch~=pitch or newroll~=roll then
         self.object:set_rotation({x=newpitch,y=newyaw,z=newroll})
     end

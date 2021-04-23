@@ -569,12 +569,15 @@ function hidroplane.flightstep(self)
     if climb_rate > 5 then climb_rate = 5 end
     if climb_rate < -5 then
         climb_rate = -5
+    end
 
-        --is an stall, force a recover
+    --is an stall, force a recover
+    if self._angle_of_attack > 0 and climb_rate < -2 then
         self._elevator_angle = 2
-        self._angle_of_attack = -0.5
+        self._angle_of_attack = -1
         newpitch = math.rad(self._angle_of_attack)
     end
+
     --minetest.chat_send_all('rate '.. climb_rate)
     local climb_angle = hidroplane.get_gauge_angle(climb_rate)
     self.climb_gauge:set_attach(self.object,'',HIDROPLANE_GAUGE_CLIMBER_POSITION,{x=0,y=0,z=climb_angle})

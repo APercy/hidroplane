@@ -1,4 +1,4 @@
-Minetest 5.4 mod: Hidroplane - Super Duck
+Minetest 5.4 mod: Hydroplane - Super Duck
 ========================================
 
 The Super Duck

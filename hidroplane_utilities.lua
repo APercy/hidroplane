@@ -471,7 +471,7 @@ function hidroplane.flightstep(self)
     local stop = false
 
     local curr_pos = self.object:get_pos()
-    --self.object:set_pos(curr_pos)
+    self.object:set_pos(curr_pos)
 
     local node_bellow = mobkit.nodeatpos(mobkit.pos_shift(curr_pos,{y=-3}))
     local is_flying = true
@@ -562,7 +562,7 @@ function hidroplane.flightstep(self)
         self.object:set_velocity({x=0,y=0,z=0})
     end
 
-    self.object:get_luaentity() --hack way to fix jitter on climb
+    --self.object:get_luaentity() --hack way to fix jitter on climb
 
     --adjust climb indicator
     local climb_rate = velocity.y * 1.5

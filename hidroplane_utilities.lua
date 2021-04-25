@@ -300,7 +300,7 @@ function hidroplane.setText(self)
        "%.2f", self.hp_max
     )
     if properties then
-        properties.infotext = "Nice hidroplane of " .. self.owner .. ". Current hp: " .. formatted
+        properties.infotext = "Nice hydroplane of " .. self.owner .. ". Current hp: " .. formatted
         self.object:set_properties(properties)
     end
 end

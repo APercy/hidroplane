@@ -33,11 +33,11 @@ initial_properties = {
 minetest.register_entity('hidroplane:rudder',{
     initial_properties = {
 	    physical = false,
-	    collide_with_objects=true,
+	    collide_with_objects=false,
 	    pointable=false,
 	    visual = "mesh",
 	    mesh = "hidroplane_rudder.b3d",
-	    textures = {"hidroplane_painting.png"},
+	    textures = {"hidroplane_painting.png",},
 	},
     _color="",
 	
@@ -55,11 +55,11 @@ minetest.register_entity('hidroplane:rudder',{
 minetest.register_entity('hidroplane:elevator',{
     initial_properties = {
 	    physical = false,
-	    collide_with_objects=true,
+	    collide_with_objects=false,
 	    pointable=false,
 	    visual = "mesh",
 	    mesh = "hidroplane_elevator.b3d",
-	    textures = {"hidroplane_painting.png"},
+	    textures = {"hidroplane_painting.png",},
 	},
     _color="",
 	
@@ -77,11 +77,11 @@ minetest.register_entity('hidroplane:elevator',{
 minetest.register_entity('hidroplane:right_aileron',{
     initial_properties = {
 	    physical = false,
-	    collide_with_objects=true,
+	    collide_with_objects=false,
 	    pointable=false,
 	    visual = "mesh",
 	    mesh = "hidroplane_aileron_r.b3d",
-	    textures = {"hidroplane_painting.png"},
+	    textures = {"hidroplane_painting.png",},
 	},
     _color="",
 	
@@ -100,11 +100,11 @@ minetest.register_entity('hidroplane:right_aileron',{
 minetest.register_entity('hidroplane:left_aileron',{
     initial_properties = {
 	    physical = false,
-	    collide_with_objects=true,
+	    collide_with_objects=false,
 	    pointable=false,
 	    visual = "mesh",
 	    mesh = "hidroplane_aileron_l.b3d",
-	    textures = {"hidroplane_painting.png"},
+	    textures = {"hidroplane_painting.png",},
 	},
     _color="",
 	

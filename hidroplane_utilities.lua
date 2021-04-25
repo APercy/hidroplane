@@ -540,15 +540,15 @@ function hidroplane.flightstep(self)
     -- end roll
 
     --accell calculation
-	if is_attached then
-        --control
-		accel, stop = hidroplane.control(self, self.dtime, hull_direction, longit_speed, longit_drag, later_speed, later_drag, accel, player, is_flying)
-    else
+    --control
+	accel, stop = hidroplane.control(self, self.dtime, hull_direction, longit_speed, longit_drag, later_speed, later_drag, accel, player, is_flying)
+	if not is_attached then
         -- for some engine error the player can be detached from the machine, so lets set him attached again
         hidroplane.checkattachBug(self)
 	end
     --end accell
     --lift calculation
+    if accel == nil then accel = {x=0,y=0,z=0} end
     accel.y = accel_y
     local new_accel = accel
     if longit_speed > 2 then

@@ -138,7 +138,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
         self._rudder_angle = self._rudder_angle + correction
 
         factor = 1
-        --if self._elevator_angle > -1.5 then factor = -1 end --here is the "compansator" adjusto to keep it stable
+        --if self._elevator_angle > -1.5 then factor = -1 end --here is the "compensator" adjusto to keep it stable
         if self._elevator_angle > 0 then factor = -1 end
         correction = (elevator_limit/10) * factor * dtime
         self._elevator_angle = self._elevator_angle + correction

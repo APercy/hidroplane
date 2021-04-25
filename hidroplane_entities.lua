@@ -290,22 +290,18 @@ minetest.register_entity("hidroplane:hidro", {
 
 	    local rudder=minetest.add_entity(pos,'hidroplane:rudder')
 	    rudder:set_attach(self.object,'',{x=0,y=0.12,z=-36.85},{x=0,y=0,z=0})
-		-- set the animation once and later only change the speed
 	    self.rudder = rudder
 
 	    local right_aileron=minetest.add_entity(pos,'hidroplane:right_aileron')
 	    right_aileron:set_attach(self.object,'',{x=0,y=8.08,z=-7},{x=0,y=0,z=0})
-		-- set the animation once and later only change the speed
 	    self.right_aileron = right_aileron
 
 	    local left_aileron=minetest.add_entity(pos,'hidroplane:left_aileron')
 	    left_aileron:set_attach(self.object,'',{x=0,y=8.08,z=-7},{x=0,y=0,z=0})
-		-- set the animation once and later only change the speed
 	    self.left_aileron = left_aileron
 
 	    local elevator=minetest.add_entity(pos,'hidroplane:elevator')
 	    elevator:set_attach(self.object,'',{x=0,y=4,z=-35.5},{x=0,y=0,z=0})
-		-- set the animation once and later only change the speed
 	    self.elevator = elevator
 
 	    local wheels=minetest.add_entity(pos,'hidroplane:wheels')

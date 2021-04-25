@@ -339,16 +339,16 @@ function hidroplane.testImpact(self, velocity, position)
         self.hp_max = self.hp_max - damage --subtract the impact value directly to hp meter
         local curr_pos = self.object:get_pos()
 
-        if self.driver_name then
-            minetest.sound_play("hidroplane_collision", {
-                to_player = self.driver_name,
-                --pos = curr_pos,
-                --max_hear_distance = 5,
-                gain = 1.0,
-                fade = 0.0,
-                pitch = 1.0,
-            })
+        minetest.sound_play("hidroplane_collision", {
+            --to_player = self.driver_name,
+            object = self.object,
+            max_hear_distance = 15,
+            gain = 1.0,
+            fade = 0.0,
+            pitch = 1.0,
+        }, true)
 
+        if self.driver_name then
             local player_name = self.driver_name
             hidroplane.setText(self)
 

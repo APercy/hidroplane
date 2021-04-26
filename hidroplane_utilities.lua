@@ -529,27 +529,43 @@ function hidroplane.flightstep(self)
 
     --roll adjust
     ---------------------------------
-	local sdir = minetest.yaw_to_dir(newyaw)
-	local snormal = {x=sdir.z,y=0,z=-sdir.x}	-- rightside, dot is negative
-	local prsr = hidroplane.dot(snormal,nhdir)
-    local rollfactor = -90
-    local roll_rate = math.rad(20)
-    newroll = (prsr*math.rad(rollfactor))*(later_speed) * roll_rate * hidroplane.sign(longit_speed)
-    --minetest.chat_send_all('newroll: '.. newroll)
+    --if longit_speed > 0 then
+	    local sdir = minetest.yaw_to_dir(newyaw)
+	    local snormal = {x=sdir.z,y=0,z=-sdir.x}	-- rightside, dot is negative
+	    local prsr = hidroplane.dot(snormal,nhdir)
+        local rollfactor = -90
+        local roll_rate = math.rad(25)
+        newroll = (prsr*math.rad(rollfactor))*(later_speed) * roll_rate * hidroplane.sign(longit_speed)
+        --minetest.chat_send_all('newroll: '.. newroll)
+    --[[else
+        local delta = 0.01
+        local dest = 0
+        newroll = math.min(math.abs(dest-(newroll+delta)), math.abs(dest-(newroll-delta)))*math.abs(newroll)/newroll*math.abs(delta)/delta+dest
+    end]]--
     ---------------------------------
     -- end roll
 
     --accell calculation
     --control
-	accel, stop = hidroplane.control(self, self.dtime, hull_direction, longit_speed, longit_drag, later_speed, later_drag, accel, player, is_flying)
 	if not is_attached then
         -- for some engine error the player can be detached from the machine, so lets set him attached again
         hidroplane.checkattachBug(self)
+    else
+        accel, stop = hidroplane.control(self, self.dtime, hull_direction, longit_speed, longit_drag, later_speed, later_drag, accel, player, is_flying)
 	end
     --end accell
-    --lift calculation
+
     if accel == nil then accel = {x=0,y=0,z=0} end
+
+    --lift calculation
     accel.y = accel_y
+
+	if self.isinliquid then
+        local bob = hidroplane.minmax(hidroplane.dot(accel,hull_direction),0.4)	-- vertical bobbing
+        accel.y = accel.y + bob
+        newpitch = newpitch + (velocity.y * math.rad(6))
+    end
+
     local new_accel = accel
     if longit_speed > 2 then
         new_accel = hidroplane.getLiftAccel(self, velocity, new_accel, longit_speed, roll, curr_pos)

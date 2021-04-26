@@ -529,7 +529,7 @@ function hidroplane.flightstep(self)
 
     --roll adjust
     ---------------------------------
-    --if longit_speed > 0 then
+    if longit_speed > 0 then
 	    local sdir = minetest.yaw_to_dir(newyaw)
 	    local snormal = {x=sdir.z,y=0,z=-sdir.x}	-- rightside, dot is negative
 	    local prsr = hidroplane.dot(snormal,nhdir)
@@ -537,11 +537,12 @@ function hidroplane.flightstep(self)
         local roll_rate = math.rad(25)
         newroll = (prsr*math.rad(rollfactor))*(later_speed) * roll_rate * hidroplane.sign(longit_speed)
         --minetest.chat_send_all('newroll: '.. newroll)
-    --[[else
-        local delta = 0.01
-        local dest = 0
-        newroll = math.min(math.abs(dest-(newroll+delta)), math.abs(dest-(newroll-delta)))*math.abs(newroll)/newroll*math.abs(delta)/delta+dest
-    end]]--
+    else
+        local delta = 0.001
+        newroll = 0
+        if roll > 0 then newroll = roll - delta end
+        if roll < 0 then newroll = roll + delta end
+    end
     ---------------------------------
     -- end roll
 

@@ -412,7 +412,7 @@ end
 
 function hidroplane.lang_gear_operate(self, curr_pos)
     local pos = curr_pos
-    pos.y = pos.y - 4
+    pos.y = pos.y - 3
     local ray = minetest.raycast(curr_pos, pos, true, true)
     local thing = ray:next()
     if thing == nil then

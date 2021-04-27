@@ -561,10 +561,15 @@ function hidroplane.flightstep(self)
     --lift calculation
     accel.y = accel_y
 
+    --lets apply some bob in water
 	if self.isinliquid then
         local bob = hidroplane.minmax(hidroplane.dot(accel,hull_direction),0.4)	-- vertical bobbing
         accel.y = accel.y + bob
-        newpitch = newpitch + (velocity.y * math.rad(6))
+        local max_pitch = 6
+        local h_vel_compensation = (((longit_speed * 2) * 100)/max_pitch)/100
+        if h_vel_compensation < 0 then h_vel_compensation = 0 end
+        if h_vel_compensation > max_pitch then h_vel_compensation = max_pitch end
+        newpitch = newpitch + (velocity.y * math.rad(max_pitch - h_vel_compensation))
     end
 
     local new_accel = accel
@@ -614,7 +619,7 @@ function hidroplane.flightstep(self)
     end
 
     --adjust elevator pitch (3d model)
-    self.elevator:set_attach(self.object,'',{x=0,y=4,z=-35.5},{x=-self._elevator_angle,y=0,z=0})
+    self.elevator:set_attach(self.object,'',{x=0,y=4,z=-35.5},{x=-self._elevator_angle*2,y=0,z=0})
     --adjust rudder
     self.rudder:set_attach(self.object,'',{x=0,y=0.12,z=-36.85},{x=0,y=self._rudder_angle,z=0})
     --adjust ailerons

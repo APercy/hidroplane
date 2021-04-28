@@ -410,36 +410,23 @@ function hidroplane.check_is_under_water(obj)
 	return liquid_up
 end
 
-function hidroplane.lang_gear_operate(self, curr_pos)
-    local pos = curr_pos
-    pos.y = pos.y - 3
-    local ray = minetest.raycast(curr_pos, pos, true, true)
-    local thing = ray:next()
-    if thing == nil then
-        self._land_retracted = true
-        --retracts landing gear
-        self.wheels:set_attach(self.object,'',{x=0,y=2.5,z=0},{x=0,y=0,z=0})
-        self.f_wheels:set_attach(self.object,'',{x=0,y=-14.2,z=13.5},{x=0,y=0,z=0})
+function hidroplane.lang_gear_operate(self)
+    if self.isonground then
+        if self._land_retracted == true then
+            self._land_retracted = false
+            --extends landing gear
+            self.wheels:set_attach(self.object,'',{x=0,y=0,z=0},{x=0,y=0,z=0})
+            self.f_wheels:set_attach(self.object,'',{x=0,y=-14.2,z=13.5},{x=29.4,y=0,z=0})
+        end
     else
-        while thing do
-	        if thing.type == "node" then
-			    local node_name = minetest.get_node(thing.under).name
-			    local drawtype = minetest.registered_nodes[node_name]["drawtype"]
-			    if drawtype == 'liquid' or drawtype == 'airlike' then
-                    self._land_retracted = true
-                    --retracts landing gear
-                    self.wheels:set_attach(self.object,'',{x=0,y=2.5,z=0},{x=0,y=0,z=0})
-                    self.f_wheels:set_attach(self.object,'',{x=0,y=-14.2,z=13.5},{x=0,y=0,z=0})
-                else
-                    self._land_retracted = false
-                    --extends landing gear
-                    self.wheels:set_attach(self.object,'',{x=0,y=0,z=0},{x=0,y=0,z=0})
-                    self.f_wheels:set_attach(self.object,'',{x=0,y=-14.2,z=13.5},{x=29.4,y=0,z=0})
-                end
-            end
-            thing = ray:next()
+        if self._land_retracted == false then
+            self._land_retracted = true
+            --retracts landing gear
+            self.wheels:set_attach(self.object,'',{x=0,y=2.5,z=0},{x=0,y=0,z=0})
+            self.f_wheels:set_attach(self.object,'',{x=0,y=-14.2,z=13.5},{x=0,y=0,z=0})
         end
     end
+
 end
 
 function hidroplane.flightstep(self)
@@ -630,7 +617,7 @@ function hidroplane.flightstep(self)
     hidroplane.consumptionCalc(self, accel)
 
     --automatically set landgear
-    hidroplane.lang_gear_operate(self, curr_pos)
+    hidroplane.lang_gear_operate(self)
 
     --test collision
     hidroplane.testImpact(self, velocity, curr_pos)

@@ -412,19 +412,19 @@ end
 
 function hidroplane.lang_gear_operate(self)
     if self.isonground then
-        if self._land_retracted == true then
+        --if self._land_retracted == true then
             self._land_retracted = false
             --extends landing gear
             self.wheels:set_attach(self.object,'',{x=0,y=0,z=0},{x=0,y=0,z=0})
             self.f_wheels:set_attach(self.object,'',{x=0,y=-14.2,z=13.5},{x=29.4,y=0,z=0})
-        end
+        --end
     else
-        if self._land_retracted == false then
+        --if self._land_retracted == false then
             self._land_retracted = true
             --retracts landing gear
             self.wheels:set_attach(self.object,'',{x=0,y=2.5,z=0},{x=0,y=0,z=0})
             self.f_wheels:set_attach(self.object,'',{x=0,y=-14.2,z=13.5},{x=0,y=0,z=0})
-        end
+        --end
     end
 
 end

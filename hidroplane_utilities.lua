@@ -61,7 +61,7 @@ function hidroplane.getLiftAccel(self, velocity, accel, longit_speed, roll, curr
     local retval = accel
     if longit_speed > 1 then
         local angle_of_attack = math.rad(self._angle_of_attack + hidroplane.wing_angle_of_attack)
-        local lift = 12
+        local lift = hidroplane.lift
         --local acc = 0.8
         local daoa = deg(angle_of_attack)
 

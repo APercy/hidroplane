@@ -517,7 +517,14 @@ function hidroplane.flightstep(self)
     --roll adjust
     ---------------------------------
     if longit_speed > 0 then
-	    local sdir = minetest.yaw_to_dir(newyaw)
+        local roll_intensity = newyaw
+        if longit_speed < 2 then
+            if self.isonground then roll_intensity = 0 end
+            if self.isinliquid == true then
+                roll_intensity = newyaw / 2
+            end
+        end
+	    local sdir = minetest.yaw_to_dir(roll_intensity)
 	    local snormal = {x=sdir.z,y=0,z=-sdir.x}	-- rightside, dot is negative
 	    local prsr = hidroplane.dot(snormal,nhdir)
         local rollfactor = -90
@@ -553,7 +560,7 @@ function hidroplane.flightstep(self)
         local bob = hidroplane.minmax(hidroplane.dot(accel,hull_direction),0.4)	-- vertical bobbing
         accel.y = accel.y + bob
         local max_pitch = 6
-        local h_vel_compensation = (((longit_speed * 2) * 100)/max_pitch)/100
+        local h_vel_compensation = (((longit_speed * 4) * 100)/max_pitch)/100
         if h_vel_compensation < 0 then h_vel_compensation = 0 end
         if h_vel_compensation > max_pitch then h_vel_compensation = max_pitch end
         newpitch = newpitch + (velocity.y * math.rad(max_pitch - h_vel_compensation))

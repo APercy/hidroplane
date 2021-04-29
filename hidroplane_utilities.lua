@@ -217,24 +217,14 @@ function hidroplane.destroy(self)
         -- detach the passenger
         local passenger = minetest.get_player_by_name(self._passenger)
         if passenger then 
-            passenger:set_detach()
-            passenger:set_eye_offset({x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
-            player_api.player_attached[self._passenger] = nil
-            -- player should stand again
-            player_api.set_animation(passenger, "stand")
+            hidroplane.dettach_pax(self, passenger)
         end
-        self._passenger = nil
     end
 
     if self.driver_name then
         -- detach the driver
         local player = minetest.get_player_by_name(self.driver_name)
-        player:set_detach()
-        player:set_eye_offset({x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
-        player_api.player_attached[self.driver_name] = nil
-        -- player should stand again
-        player_api.set_animation(player, "stand")
-        self.driver_name = nil
+        hidroplane.dettachPlayer(self, player)
     end
 
     local pos = self.object:get_pos()

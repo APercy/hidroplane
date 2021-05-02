@@ -506,7 +506,7 @@ function hidroplane.flightstep(self)
 
     --roll adjust
     ---------------------------------
-    if longit_speed > 0 then
+    if longit_speed > 2 then
         local roll_intensity = newyaw
         if longit_speed < 2 then
             if self.isonground then roll_intensity = 0 end
@@ -514,9 +514,9 @@ function hidroplane.flightstep(self)
                 roll_intensity = newyaw / 2
             end
         end
-	    local sdir = minetest.yaw_to_dir(roll_intensity)
-	    local snormal = {x=sdir.z,y=0,z=-sdir.x}	-- rightside, dot is negative
-	    local prsr = hidroplane.dot(snormal,nhdir)
+        local sdir = minetest.yaw_to_dir(roll_intensity)
+        local snormal = {x=sdir.z,y=0,z=-sdir.x}	-- rightside, dot is negative
+        local prsr = hidroplane.dot(snormal,nhdir)
         local rollfactor = -90
         local roll_rate = math.rad(25)
         newroll = (prsr*math.rad(rollfactor))*(later_speed) * roll_rate * hidroplane.sign(longit_speed)

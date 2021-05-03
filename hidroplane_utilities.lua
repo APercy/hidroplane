@@ -435,7 +435,6 @@ function hidroplane.flightstep(self)
 	local newroll=roll
 
     local velocity = self.object:get_velocity()
-    self.object:set_velocity(velocity)
     local hull_direction = mobkit.rot_to_dir(rotation) --minetest.yaw_to_dir(yaw)
     local nhdir = {x=hull_direction.z,y=0,z=-hull_direction.x}		-- lateral unit vector
 
@@ -450,6 +449,7 @@ function hidroplane.flightstep(self)
 
     local curr_pos = self.object:get_pos()
     self.object:set_pos(curr_pos)
+    self.object:set_velocity(velocity)
 
     local node_bellow = mobkit.nodeatpos(mobkit.pos_shift(curr_pos,{y=-3}))
     local is_flying = true

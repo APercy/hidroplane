@@ -5,7 +5,7 @@ The Super Duck
 
 This one tries to implement some flight, using the mobkit mod.
 In order to fly, it is necessary to first supply the airplane with biofuel.
-Then with a bottle or gallon selected, punch it against the trike.
+Then with a bottle or gallon selected, punch it against the airplane floater.
 You can use 10 bottles them to fill the tank. See the fuel gauge on the airplane
 panel (right below, with a green F). To embark, click with the right button.
 While the machine is off, it is possible to move it using the sneak and jump keys (shift an space).

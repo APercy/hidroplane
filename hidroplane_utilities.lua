@@ -452,7 +452,7 @@ function hidroplane.flightstep(self)
     --hack to avoid glitches
     self.object:set_velocity(velocity)
     local curr_pos = self.object:get_pos()
-    --self.object:set_pos(curr_pos)
+    self.object:set_pos(curr_pos)
 
     local node_bellow = mobkit.nodeatpos(mobkit.pos_shift(curr_pos,{y=-3}))
     local is_flying = true

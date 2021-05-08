@@ -433,6 +433,8 @@ function hidroplane.flightstep(self)
     local newpitch = pitch
 	local roll = rotation.z
 	local newroll=roll
+    if newroll > 360 then newroll = newroll - 360 end
+    if newroll < -360 then newroll = newroll + 360 end
 
     local velocity = self.object:get_velocity()
     local hull_direction = mobkit.rot_to_dir(rotation) --minetest.yaw_to_dir(yaw)
@@ -447,9 +449,10 @@ function hidroplane.flightstep(self)
     local accel = vector.add(longit_drag,later_drag)
     local stop = false
 
-    local curr_pos = self.object:get_pos()
-    self.object:set_pos(curr_pos)
+    --hack to avoid glitches
     self.object:set_velocity(velocity)
+    local curr_pos = self.object:get_pos()
+    --self.object:set_pos(curr_pos)
 
     local node_bellow = mobkit.nodeatpos(mobkit.pos_shift(curr_pos,{y=-3}))
     local is_flying = true
@@ -500,34 +503,30 @@ function hidroplane.flightstep(self)
     end
     
     -- new yaw
+    local yaw_turn = 0
 	if math.abs(self._rudder_angle)>5 then 
-        local turn_rate = math.rad(18)
-		newyaw = yaw + self.dtime*(1 - 1 / (math.abs(longit_speed) + 1)) * self._rudder_angle / 30 * turn_rate * hidroplane.sign(longit_speed)
+        local turn_rate = math.rad(40)
+        yaw_turn = self.dtime * math.rad(self._rudder_angle) * turn_rate * hidroplane.sign(longit_speed)
+		newyaw = yaw + yaw_turn
 	end
 
     --roll adjust
     ---------------------------------
-    if longit_speed > 2 then
-        local roll_intensity = newyaw
-        if longit_speed < 2 then
-            if self.isonground then roll_intensity = 0 end
-            if self.isinliquid == true then
-                roll_intensity = newyaw / 2
-            end
-        end
-        local sdir = minetest.yaw_to_dir(roll_intensity)
+    local delta = 0.002
+    if is_flying then
+        local roll_reference = newyaw
+        local sdir = minetest.yaw_to_dir(roll_reference)
         local snormal = {x=sdir.z,y=0,z=-sdir.x}	-- rightside, dot is negative
         local prsr = hidroplane.dot(snormal,nhdir)
         local rollfactor = -90
         local roll_rate = math.rad(25)
-        newroll = (prsr*math.rad(rollfactor))*(later_speed) * roll_rate * hidroplane.sign(longit_speed)
+        newroll = (prsr*math.rad(rollfactor)) * (later_speed * roll_rate) * hidroplane.sign(longit_speed)
         --minetest.chat_send_all('newroll: '.. newroll)
     else
-        local delta = 0.001
-        newroll = 0
         if roll > 0 then newroll = roll - delta end
         if roll < 0 then newroll = roll + delta end
     end
+
     ---------------------------------
     -- end roll
 

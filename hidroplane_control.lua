@@ -134,7 +134,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
     if longit_speed > 0 then
         local factor = 1
         if self._rudder_angle > 0 then factor = -1 end
-        local correction = (rudder_limit*(longit_speed/750)) * factor
+        local correction = (rudder_limit*(longit_speed/1000)) * factor
         self._rudder_angle = self._rudder_angle + correction
 
         factor = 1

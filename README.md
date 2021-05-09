@@ -40,6 +40,16 @@ The limitations: because the lack in functions to roll the camera, and the rudde
 the airplane is unable to do a tuneau, barrel roll, loopings and any kind of aerobatics maneuvers. 
 It was limited at the source. You can modify it by your own, just making the roll movement cumulative and increasing the speeds
 
+**Controls overview :**
+Right click: enter in/get off plane
+Left click (with biofuel): add fuel to plane
+E: Start engine
+Jump: Increase power
+Sneak: Decrease power
+Backward: brake on ground, go up flying
+Forward: forward on ground, go down flying
+Left/right: Turn to left/right, work on and out ground.
+
 -----------------------
 License of source code:
 LGPL v3 (see file LICENSE) 

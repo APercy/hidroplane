@@ -44,10 +44,10 @@ It was limited at the source. You can modify it by your own, just making the rol
 * Right click: enter in/get off plane
 * Left click (with biofuel): add fuel to plane
 * E: Start engine
-* Jump: Increase power
-* Sneak: Decrease power
-* Backward: brake on ground, go up flying
-* Forward: forward on ground, go down flying
+* Jump: Increase power, forward on ground
+* Sneak: Decrease power, brake on ground
+* Backward: go up flying - nose up
+* Forward: go down flying - nose down
 * Left/right: Turn to left/right, work on and out ground.
 
 -----------------------

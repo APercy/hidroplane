@@ -49,6 +49,7 @@ It was limited at the source. You can modify it by your own, just making the rol
 * Backward: go up flying - nose up
 * Forward: go down flying - nose down
 * Left/right: Turn to left/right, work on and out ground.
+* Left and Right together: center all commands
 
 -----------------------
 License of source code:

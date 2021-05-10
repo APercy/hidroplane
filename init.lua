@@ -55,3 +55,30 @@ minetest.register_privilege("flight_licence", {
     give_to_singleplayer = true
 })
 
+-- add chatcommand to eject from hydroplane
+
+minetest.register_chatcommand("hydro_eject", {
+	params = "",
+	description = "Ejects from hydroplane",
+	privs = {interact = true},
+	func = function(name, param)
+        local colorstring = core.colorize('#ff0000', " >>> you are not inside your hydroplane")
+        local player = minetest.get_player_by_name(name)
+        local attached_to = player:get_attach()
+
+		if attached_to ~= nil then
+            local parent = attached_to:get_attach()
+            if parent ~= nil then
+                local entity = parent:get_luaentity()
+                if entity.driver_name == name and entity.name == "hidroplane:hidro" then
+                    motorboat.dettach(entity, player)
+                else
+			        minetest.chat_send_player(name,colorstring)
+                end
+            end
+		else
+			minetest.chat_send_player(name,colorstring)
+		end
+	end	
+})
+

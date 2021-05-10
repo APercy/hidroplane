@@ -129,6 +129,12 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 		elseif ctrl.left then
 			self._rudder_angle = math.min(self._rudder_angle+30*self.dtime,rudder_limit)
 		end
+
+        --I'm desperate, center all!
+        if ctrl.right and ctrl.left then
+            self._elevator_angle = 0
+            self._rudder_angle = 0
+        end
 	end
 
     if longit_speed > 0 then

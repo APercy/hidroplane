@@ -166,6 +166,28 @@ initial_properties = {
 	
 })
 
+minetest.register_entity('hidroplane:stick',{
+initial_properties = {
+	physical = false,
+	collide_with_objects=false,
+	pointable=false,
+	visual = "mesh",
+	mesh = "hidroplane_stick.b3d",
+	textures = {"hidroplane_metal.png", "hidroplane_black.png", "hidroplane_red.png", },
+	},
+	
+    on_activate = function(self,std)
+	    self.sdata = minetest.deserialize(std) or {}
+	    if self.sdata.remove then self.object:remove() end
+    end,
+	    
+    get_staticdata=function(self)
+      self.sdata.remove=true
+      return minetest.serialize(self.sdata)
+    end,
+	
+})
+
 --
 -- fuel
 --
@@ -343,6 +365,10 @@ minetest.register_entity("hidroplane:hidro", {
         local passenger_seat_base=minetest.add_entity(pos,'hidroplane:seat_base')
         passenger_seat_base:set_attach(self.object,'',{x=0,y=-5,z=-6},{x=0,y=0,z=0})
 	    self.passenger_seat_base = passenger_seat_base
+
+	    local stick=minetest.add_entity(pos,'hidroplane:stick')
+	    stick:set_attach(self.object,'',{x=0,y=-6.85,z=8},{x=0,y=0,z=0})
+	    self.stick = stick
 
         hidroplane.paint(self, self.object, self._color, "hidroplane_painting.png")
         hidroplane.paint(self, self.elevator, self._color, "hidroplane_painting.png")

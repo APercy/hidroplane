@@ -245,6 +245,8 @@ function hidroplane.destroy(self)
     if self.right_aileron then self.right_aileron:remove() end
     if self.left_aileron then self.left_aileron:remove() end
 
+    if self.stick then self.stick:remove() end
+
     self.object:remove()
 
     pos.y=pos.y+2
@@ -505,8 +507,8 @@ function hidroplane.flightstep(self)
     -- new yaw
     local yaw_turn = 0
 	if math.abs(self._rudder_angle)>5 then 
-        local turn_rate = math.rad(40)
-        yaw_turn = self.dtime * math.rad(self._rudder_angle) * turn_rate * hidroplane.sign(longit_speed)
+        local turn_rate = math.rad(14)
+        yaw_turn = self.dtime * math.rad(self._rudder_angle) * turn_rate * hidroplane.sign(longit_speed) * math.abs(longit_speed/2)
 		newyaw = yaw + yaw_turn
 	end
 
@@ -609,6 +611,8 @@ function hidroplane.flightstep(self)
     --adjust ailerons
     self.right_aileron:set_attach(self.object,'',{x=0,y=8.08,z=-7},{x=-self._rudder_angle,y=0,z=0})
     self.left_aileron:set_attach(self.object,'',{x=0,y=8.08,z=-7},{x=self._rudder_angle,y=0,z=0})
+    --set stick position
+    self.stick:set_attach(self.object,'',{x=0,y=-6,85,z=8},{x=self._elevator_angle/2,y=0,z=self._rudder_angle})
 
     -- calculate energy consumption --
     hidroplane.consumptionCalc(self, accel)

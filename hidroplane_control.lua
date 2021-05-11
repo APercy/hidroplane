@@ -18,7 +18,7 @@ end
 function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_drag, later_speed, later_drag, accel, player, is_flying)
     hidroplane.last_time_command = hidroplane.last_time_command + self.dtime
     if hidroplane.last_time_command > 1 then hidroplane.last_time_command = 1 end
-    if self.driver_name == nil then return end
+    --if self.driver_name == nil then return end
     local retval_accel = accel
 
     local rudder_limit = 30   

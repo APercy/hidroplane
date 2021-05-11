@@ -102,12 +102,19 @@ function hidroplane.get_gauge_angle(value, initial_angle)
 end
 
 -- attach player
-function hidroplane.attach(self, player)
+function hidroplane.attach(self, player, instructor_mode)
+    instructor_mode = instructor_mode or false
     local name = player:get_player_name()
     self.driver_name = name
 
     -- attach the driver
-    player:set_attach(self.pilot_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
+    if instructor_mode == true then
+        player:set_attach(self.passenger_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
+        player:set_eye_offset({x = 0, y = -2.5, z = 2}, {x = 0, y = 1, z = -30})
+    else
+        player:set_attach(self.pilot_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
+        player:set_eye_offset({x = 0, y = -4, z = 2}, {x = 0, y = 1, z = -30})
+    end
     player:set_eye_offset({x = 0, y = -4, z = 2}, {x = 0, y = 1, z = -30})
     player_api.player_attached[name] = true
     -- make the driver sit
@@ -126,8 +133,13 @@ function hidroplane.attach_pax(self, player)
     self._passenger = name
 
     -- attach the driver
-    player:set_attach(self.passenger_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
-    player:set_eye_offset({x = 0, y = -2.5, z = 2}, {x = 0, y = 3, z = -30})
+    if self._instruction_mode == true then
+        player:set_attach(self.pilot_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
+        player:set_eye_offset({x = 0, y = -4, z = 2}, {x = 0, y = 3, z = -30})
+    else
+        player:set_attach(self.passenger_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
+        player:set_eye_offset({x = 0, y = -2.5, z = 2}, {x = 0, y = 3, z = -30})
+    end
     player_api.player_attached[name] = true
     -- make the driver sit
     minetest.after(0.2, function()
@@ -143,17 +155,10 @@ function hidroplane.dettachPlayer(self, player)
     local name = self.driver_name
     hidroplane.setText(self)
 
-    self._engine_running = false
+    --self._engine_running = false
 
     -- driver clicked the object => driver gets off the vehicle
     self.driver_name = nil
-    -- sound and animation
-    if self.sound_handle then
-        minetest.sound_stop(self.sound_handle)
-        self.sound_handle = nil
-    end
-    
-    self.engine:set_animation_frame_speed(0)
 
     -- detach the player
     player:set_detach()
@@ -182,7 +187,7 @@ function hidroplane.checkAttach(self, player)
     if player then
         local player_attach = player:get_attach()
         if player_attach then
-            if player_attach == self.pilot_seat_base then
+            if player_attach == self.pilot_seat_base or player_attach == self.passenger_seat_base then
                 return true
             end
         end
@@ -376,21 +381,22 @@ function hidroplane.checkattachBug(self)
         local player = minetest.get_player_by_name(self.owner)
         if player then
 		    if player:get_hp() > 0 then
-                hidroplane.attach(self, player)
+                hidroplane.attach(self, player, self._instruction_mode)
                 can_stop = false
             else
                 hidroplane.dettachPlayer(self, player)
 		    end
+        else
+            if self._passenger ~= nil and self._command_is_given == false then hidroplane.transfer_control(self, true) end
         end
     end
 
-    if can_stop then
-        --detach player
+    --[[if can_stop then
         if self.sound_handle ~= nil then
             minetest.sound_stop(self.sound_handle)
             self.sound_handle = nil
         end
-    end
+    end]]--
 end
 
 function hidroplane.check_is_under_water(obj)
@@ -421,11 +427,37 @@ function hidroplane.lang_gear_operate(self)
 
 end
 
+function hidroplane.transfer_control(self, status)
+    if status == false then
+        self._command_is_given = false
+        if self._passenger then minetest.chat_send_player(self._passenger,core.colorize('#ff0000', " >>> The flight instructor got the control.")) end
+        if self.driver_name then minetest.chat_send_player(self.driver_name,core.colorize('#00ff00', " >>> The control is with you now.")) end
+    else
+        self._command_is_given = true
+        if self._passenger then minetest.chat_send_player(self._passenger,core.colorize('#00ff00', " >>> The control is with you now.")) end
+        if self.driver_name then minetest.chat_send_player(self.driver_name," >>> The control was given.") end
+    end
+end
+
 function hidroplane.flightstep(self)
     local player = nil
     if self.driver_name then player = minetest.get_player_by_name(self.driver_name) end
     local passenger = nil
     if self._passenger then passenger = minetest.get_player_by_name(self._passenger) end
+
+    -- change the driver
+    if player and passenger then
+        local ctrl = player:get_player_control()
+        local colorstring = ""
+        if ctrl.sneak == true and ctrl.jump == true and self._instruction_mode == true  and hidroplane.last_time_command >= 1 then
+            hidroplane.last_time_command = 0
+            if self._command_is_given == true then
+                hidroplane.transfer_control(self, false)
+            else
+                hidroplane.transfer_control(self, true)
+            end
+        end
+    end
 
     local accel_y = self.object:get_acceleration().y
     local rotation = self.object:get_rotation()
@@ -537,9 +569,18 @@ function hidroplane.flightstep(self)
 	if not is_attached then
         -- for some engine error the player can be detached from the machine, so lets set him attached again
         hidroplane.checkattachBug(self)
+    end
+
+    local pilot = player
+    if self._command_is_given and passenger then
+        pilot = passenger
     else
-        accel, stop = hidroplane.control(self, self.dtime, hull_direction, longit_speed, longit_drag, later_speed, later_drag, accel, player, is_flying)
-	end
+        self._command_is_given = false
+    end
+    if is_attached or passenger then
+        accel, stop = hidroplane.control(self, self.dtime, hull_direction, longit_speed, longit_drag, later_speed, later_drag, accel, pilot, is_flying)
+    end
+
     --end accell
 
     if accel == nil then accel = {x=0,y=0,z=0} end

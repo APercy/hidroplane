@@ -43,6 +43,7 @@ It was limited at the source. You can modify it by your own, just making the rol
 **Controls overview :**
 * Right click: enter in/get off plane
 * Left click (with biofuel): add fuel to plane
+* Right click and Sneak: enter in flight instructor mode (limited vision, so use debug info)
 * E: Start engine
 * Jump: Increase power, forward on ground
 * Sneak: Decrease power, brake on ground
@@ -50,6 +51,7 @@ It was limited at the source. You can modify it by your own, just making the rol
 * Forward: go down flying - nose down
 * Left/right: Turn to left/right, work on and out ground.
 * Left and Right together: center all commands
+* Sneak and Jump together: give/take the controls to/from pilot student
 
 -----------------------
 License of source code:

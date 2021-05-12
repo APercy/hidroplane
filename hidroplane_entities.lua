@@ -503,7 +503,7 @@ minetest.register_entity("hidroplane:hidro", {
                         --ok, remove pax
                         if self._passenger then
                             local passenger = minetest.get_player_by_name(self._passenger)
-                            hidroplane.dettach_pax(self, passenger)
+                            if passenger then hidroplane.dettach_pax(self, passenger) end
                         end
                     else
                         --give the control to the pax
@@ -530,7 +530,7 @@ minetest.register_entity("hidroplane:hidro", {
                     --remove pax to prevent bug
                     if self._passenger then
                         local passenger = minetest.get_player_by_name(self._passenger)
-                        hidroplane.dettach_pax(self, passenger)
+                        if passenger then hidroplane.dettach_pax(self, passenger) end
                     end
 
 		            if clicker:get_player_control().sneak == true then

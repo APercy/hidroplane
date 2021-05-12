@@ -556,7 +556,7 @@ minetest.register_entity("hidroplane:hidro", {
         else
             --passenger section
             --only can enter when the pilot is inside
-            local message = core.colorize('#ff0000', " >>> You arent the owner of this airplane.")
+            local message = core.colorize('#ff0000', " >>> You aren't the owner of this airplane.")
             if self.driver_name ~= nil then
                 local player = minetest.get_player_by_name(self.driver_name)
                 if player then

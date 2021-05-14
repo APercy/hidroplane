@@ -275,6 +275,7 @@ minetest.register_entity("hidroplane:hidro", {
     _last_vel = {x=0,y=0,z=0},
     _longit_speed = 0,
     _land_retracted = true,
+    _show_hud = false,
     _instruction_mode = false, --flag to intruction mode
     _command_is_given = false, --flag to mark the "owner" of the commands now
 

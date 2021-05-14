@@ -1,4 +1,5 @@
 dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_global_definitions.lua")
+dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_hud.lua")
 
 function hidroplane.get_hipotenuse_value(point1, point2)
     return math.sqrt((point1.x - point2.x) ^ 2 + (point1.y - point2.y) ^ 2 + (point1.z - point2.z) ^ 2)
@@ -154,6 +155,8 @@ end
 function hidroplane.dettachPlayer(self, player)
     local name = self.driver_name
     hidroplane.setText(self)
+
+    hidroplane.remove_hud(player)
 
     --self._engine_running = false
 
@@ -445,16 +448,27 @@ function hidroplane.flightstep(self)
     local passenger = nil
     if self._passenger then passenger = minetest.get_player_by_name(self._passenger) end
 
-    -- change the driver
-    if player and passenger then
+    if player then
         local ctrl = player:get_player_control()
-        local colorstring = ""
-        if ctrl.sneak == true and ctrl.jump == true and self._instruction_mode == true  and hidroplane.last_time_command >= 1 then
+        -- change the driver
+        if passenger then
+            local colorstring = ""
+            if ctrl.sneak == true and ctrl.jump == true and self._instruction_mode == true  and hidroplane.last_time_command >= 1 then
+                hidroplane.last_time_command = 0
+                if self._command_is_given == true then
+                    hidroplane.transfer_control(self, false)
+                else
+                    hidroplane.transfer_control(self, true)
+                end
+            end
+        end
+        -- shows the hud for the player
+        if ctrl.up == true and ctrl.down == true and hidroplane.last_time_command >= 1 then
             hidroplane.last_time_command = 0
-            if self._command_is_given == true then
-                hidroplane.transfer_control(self, false)
+            if self._show_hud == true then
+                self._show_hud = false
             else
-                hidroplane.transfer_control(self, true)
+                self._show_hud = true
             end
         end
     end
@@ -641,6 +655,14 @@ function hidroplane.flightstep(self)
     if indicated_speed < 0 then indicated_speed = 0 end
     local speed_angle = hidroplane.get_gauge_angle(indicated_speed, -45)
     self.speed_gauge:set_attach(self.object,'',HIDROPLANE_GAUGE_SPEED_POSITION,{x=0,y=0,z=speed_angle})
+
+    if is_attached then
+        if self._show_hud then
+            hidroplane.update_hud(player, climb_angle, speed_angle)
+        else
+            hidroplane.remove_hud(player)
+        end
+    end
 
     --adjust power indicator
     local power_indicator_angle = hidroplane.get_gauge_angle(self._power_lever/10)

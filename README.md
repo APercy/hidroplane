@@ -57,6 +57,7 @@ It was limited at the source. You can modify it by your own, just making the rol
 **Chat Commands: **
 
 /hydro_eject - ejects from the vehicle
+
 /hydro_manual - shows the manual
 
 -----------------------

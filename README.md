@@ -40,7 +40,7 @@ The limitations: because the lack in functions to roll the camera, and the rudde
 the airplane is unable to do a tuneau, barrel roll, loopings and any kind of aerobatics maneuvers. 
 It was limited at the source. You can modify it by your own, just making the roll movement cumulative and increasing the speeds
 
-**Controls overview :**
+**Controls overview:**
 * Right click: enter in/get off plane
 * Left click (with biofuel): add fuel to plane
 * Right click and Sneak: enter in flight instructor mode (limited vision, so use debug info)
@@ -53,6 +53,11 @@ It was limited at the source. You can modify it by your own, just making the rol
 * Left and Right together: center all commands
 * Sneak and Jump together: give/take the controls to/from pilot student
 * Up and Down together: enable/disable HUD
+
+**Chat Commands: **
+
+/hydro_eject - ejects from the vehicle
+/hydro_manual - shows the manual
 
 -----------------------
 License of source code:

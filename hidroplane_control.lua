@@ -1,6 +1,7 @@
 --global constants
 hidroplane.last_time_command = 0
 hidroplane.vector_up = vector.new(0, 1, 0)
+hidroplane.ideal_step = 0.02
 
 dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_utilities.lua")
 
@@ -16,7 +17,7 @@ function hidroplane.check_node_below(obj)
 end
 
 function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_drag, later_speed, later_drag, accel, player, is_flying)
-    hidroplane.last_time_command = hidroplane.last_time_command + self.dtime
+    hidroplane.last_time_command = hidroplane.last_time_command + dtime
     if hidroplane.last_time_command > 1 then hidroplane.last_time_command = 1 end
     --if self.driver_name == nil then return end
     local retval_accel = accel
@@ -40,6 +41,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
                     self.sound_handle = nil
                 end
 		        self.engine:set_animation_frame_speed(0)
+                self._power_lever = 0 --zero power
 		    elseif self._engine_running == false and self._energy > 0 then
 			    self._engine_running = true
 	            -- sound and animation
@@ -56,10 +58,14 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
             engineacc = (self._power_lever * hidroplane.max_engine_acc) / 100;
             self.engine:set_animation_frame_speed(60 + self._power_lever)
 
+            local add_factor = 1
+            add_factor = add_factor * (dtime/hidroplane.ideal_step) --adjusting the command speed by dtime
+
             --increase power lever
             if ctrl.jump then
                 if self._power_lever < 100 then
-                    self._power_lever = self._power_lever + 1
+                    self._power_lever = self._power_lever + add_factor
+                    if ctrl.zoom then self._power_lever = 100 end
                 end
                 if self._power_lever > 100 then
                     self._power_lever = 100
@@ -74,7 +80,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
             --decrease power lever
             if ctrl.sneak then
                 if self._power_lever > 0 then
-                    self._power_lever = self._power_lever - 1
+                    self._power_lever = self._power_lever - add_factor
                     if self._power_lever < 0 then self._power_lever = 0 end
                 end
                 if self._power_lever <= 0 and is_flying == false then
@@ -118,16 +124,16 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 
         --pitch
 		if ctrl.down then
-			self._elevator_angle = math.max(self._elevator_angle-10*self.dtime,-elevator_limit)
+			self._elevator_angle = math.max(self._elevator_angle-10*dtime,-elevator_limit)
 		elseif ctrl.up then
-			self._elevator_angle = math.min(self._elevator_angle+10*self.dtime,elevator_limit)
+			self._elevator_angle = math.min(self._elevator_angle+10*dtime,elevator_limit)
 		end
 
 		-- yaw
 		if ctrl.right then
-			self._rudder_angle = math.max(self._rudder_angle-30*self.dtime,-rudder_limit)
+			self._rudder_angle = math.max(self._rudder_angle-30*dtime,-rudder_limit)
 		elseif ctrl.left then
-			self._rudder_angle = math.min(self._rudder_angle+30*self.dtime,rudder_limit)
+			self._rudder_angle = math.min(self._rudder_angle+30*dtime,rudder_limit)
 		end
 
         --I'm desperate, center all!

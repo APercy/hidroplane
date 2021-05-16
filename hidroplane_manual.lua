@@ -30,7 +30,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
                 "* Left click (with biofuel): add fuel to plane \n",
                 "* Right click and Sneak: enter in flight instructor mode (limited \n",
                 "      vision, so use external camera) \n",
-                "* E: Start/stop engine \n",
+                "* E (aux1): Start/stop engine \n",
                 "* Jump: Increase power, forward on ground \n",
                 "* Sneak: Decrease power, brake on ground \n",
                 "* Backward: go up flying - nose up \n",

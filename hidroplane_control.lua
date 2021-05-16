@@ -65,7 +65,6 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
             if ctrl.jump then
                 if self._power_lever < 100 then
                     self._power_lever = self._power_lever + add_factor
-                    if ctrl.zoom then self._power_lever = 100 end
                 end
                 if self._power_lever > 100 then
                     self._power_lever = 100

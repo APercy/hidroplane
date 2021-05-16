@@ -31,6 +31,7 @@ dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_fuel_manag
 dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_custom_physics.lua")
 dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_utilities.lua")
 dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_entities.lua")
+dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_manual.lua")
 
 --
 -- helpers and co.
@@ -79,6 +80,15 @@ minetest.register_chatcommand("hydro_eject", {
 		else
 			minetest.chat_send_player(name,colorstring)
 		end
+	end	
+})
+
+minetest.register_chatcommand("hydro_manual", {
+	params = "",
+	description = "Hydroplane operation manual",
+	privs = {interact = true},
+	func = function(name, param)
+        hidroplane.manual_formspec(name)
 	end	
 })
 

@@ -52,6 +52,7 @@ It was limited at the source. You can modify it by your own, just making the rol
 * Left/right: Turn to left/right, work on and out ground.
 * Left and Right together: center all commands
 * Sneak and Jump together: give/take the controls to/from pilot student
+* Up and Down together: enable/disable HUD
 
 -----------------------
 License of source code:

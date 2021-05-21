@@ -122,17 +122,20 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
         retval_accel=vector.add(retval_accel,hull_acc)
 
         --pitch
+        local pitch_factor = 10
 		if ctrl.down then
-			self._elevator_angle = math.max(self._elevator_angle-10*dtime,-elevator_limit)
+			self._elevator_angle = math.max(self._elevator_angle-pitch_factor*dtime,-elevator_limit)
 		elseif ctrl.up then
-			self._elevator_angle = math.min(self._elevator_angle+10*dtime,elevator_limit)
+            if self._angle_of_attack < 0 then pitch_factor = 1 end --lets reduce the command power to avoid accidents
+			self._elevator_angle = math.min(self._elevator_angle+pitch_factor*dtime,elevator_limit)
 		end
 
 		-- yaw
+        local yaw_factor = 30
 		if ctrl.right then
-			self._rudder_angle = math.max(self._rudder_angle-30*dtime,-rudder_limit)
+			self._rudder_angle = math.max(self._rudder_angle-yaw_factor*dtime,-rudder_limit)
 		elseif ctrl.left then
-			self._rudder_angle = math.min(self._rudder_angle+30*dtime,rudder_limit)
+			self._rudder_angle = math.min(self._rudder_angle+yaw_factor*dtime,rudder_limit)
 		end
 
         --I'm desperate, center all!

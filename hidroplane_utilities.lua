@@ -306,7 +306,7 @@ function hidroplane.setText(self)
 end
 
 function hidroplane.testImpact(self, velocity, position)
-    collision = false
+    local collision = false
     if self._last_vel == nil then return end
     local impact = abs(hidroplane.get_hipotenuse_value(velocity, self._last_vel))
     --minetest.chat_send_all('impact: '.. impact .. ' - hp: ' .. self.hp_max)

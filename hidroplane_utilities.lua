@@ -451,13 +451,18 @@ function hidroplane.flightstep(self)
     if player then
         local ctrl = player:get_player_control()
         -- change the driver
-        if passenger then
+        if passenger and hidroplane.last_time_command >= 1 and self._instruction_mode == true then
             local colorstring = ""
-            if ctrl.sneak == true and ctrl.jump == true and self._instruction_mode == true  and hidroplane.last_time_command >= 1 then
-                hidroplane.last_time_command = 0
-                if self._command_is_given == true then
+            if self._command_is_given == true then
+                if ctrl.sneak or ctrl.jump or ctrl.up or ctrl.down or ctrl.right or ctrl.left then
+                    hidroplane.last_time_command = 0
+                    --take the control
                     hidroplane.transfer_control(self, false)
-                else
+                end
+            else
+                if ctrl.sneak == true and ctrl.jump == true then
+                    hidroplane.last_time_command = 0
+                    --trasnfer the control to student
                     hidroplane.transfer_control(self, true)
                 end
             end

@@ -16,14 +16,15 @@ function hidroplane.check_node_below(obj)
 	return touching_ground, liquid_below
 end
 
-function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_drag, later_speed, later_drag, accel, player, is_flying)
+function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_drag,
+                            later_speed, later_drag, accel, player, is_flying)
     hidroplane.last_time_command = hidroplane.last_time_command + dtime
     if hidroplane.last_time_command > 1 then hidroplane.last_time_command = 1 end
     --if self.driver_name == nil then return end
     local retval_accel = accel
 
-    local rudder_limit = 30   
-    local elevator_limit = 40 
+    local rudder_limit = 30
+    local elevator_limit = 40
     local stop = false
 
 	-- player control
@@ -46,16 +47,17 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 			    self._engine_running = true
 	            -- sound and animation
                 self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
-	                {object = self.object, gain = 2.0, pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32, loop = true,})
+	                {object = self.object, gain = 2.0,
+                        pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32,
+                        loop = true,})
                 self.engine:set_animation_frame_speed(60)
 		    end
-        end		
+        end
 
         self._acceleration = 0
         if self._engine_running then
-            local engineacc = 0
             --engine acceleration calc
-            engineacc = (self._power_lever * hidroplane.max_engine_acc) / 100;
+            local engineacc = (self._power_lever * hidroplane.max_engine_acc) / 100;
             self.engine:set_animation_frame_speed(60 + self._power_lever)
 
             local add_factor = 1
@@ -73,7 +75,9 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
                     --sound
                     minetest.sound_stop(self.sound_handle)
                     self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
-	                    {object = self.object, gain = 2.0, pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32, loop = true,})
+	                    {object = self.object, gain = 2.0,
+                            pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32,
+                            loop = true,})
                 end
             end
             --decrease power lever
@@ -97,7 +101,9 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
                     --sound
                     minetest.sound_stop(self.sound_handle)
                     self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
-		                {object = self.object, gain = 2.0, pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32, loop = true,})
+		                {object = self.object, gain = 2.0,
+                            pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32,
+                            loop = true,})
                 end
             end
             --do not exceed

@@ -247,12 +247,12 @@ minetest.register_entity("hidroplane:hidro", {
 	    visual = "mesh",
 	    mesh = "hidroplane_fuselage.b3d",
         stepheight = 0.5,
-        textures = {"hidroplane_black.png", "hidroplane_black.png", "hidroplane_metal.png", "hidroplane_painting.png", 
-                    "hidroplane_grey.png", "hidroplane_painting.png", "hidroplane_painting.png", "hidroplane_panel.png", 
-                    "hidroplane_painting.png", "hidroplane_glass.png", "hidroplane_glass.png", "hidroplane_black.png", 
-                    "hidroplane_grey.png", "hidroplane_black.png", "hidroplane_black2.png",
-                    "hidroplane_black.png", "hidroplane_glass.png", "hidroplane_black.png", 
-                    "hidroplane_painting.png"},
+        textures = {"hidroplane_black.png", "hidroplane_black.png", "hidroplane_metal.png", "hidroplane_painting.png",
+                "hidroplane_grey.png", "hidroplane_painting.png", "hidroplane_painting.png", "hidroplane_panel.png",
+                "hidroplane_painting.png", "hidroplane_glass.png", "hidroplane_glass.png", "hidroplane_black.png",
+                "hidroplane_grey.png", "hidroplane_black.png", "hidroplane_black2.png",
+                "hidroplane_black.png", "hidroplane_glass.png", "hidroplane_black.png",
+                "hidroplane_painting.png"},
     },
     textures = {},
 	driver_name = nil,
@@ -399,8 +399,6 @@ minetest.register_entity("hidroplane:hidro", {
 			-- do not allow other players to remove the object while there is a driver
 			return
 		end
-
-        local touching_ground, liquid_below = hidroplane.check_node_below(self.object)
         
         local is_attached = false
         if puncher:get_attach() == self.object then is_attached = true end
@@ -415,13 +413,14 @@ minetest.register_entity("hidroplane:hidro", {
             end
 
             --repair
-            if (item_name == "hidroplane:repair_tool" or item_name == "trike:repair_tool") and self._engine_running == false  then
+            if (item_name == "hidroplane:repair_tool" or item_name == "trike:repair_tool")
+                    and self._engine_running == false  then
                 if self.hp_max < 50 then
                     local inventory_item = "default:steel_ingot"
                     local inv = puncher:get_inventory()
                     if inv:contains_item("main", inventory_item) then
                         local stack = ItemStack(inventory_item .. " 1")
-                        local taken = inv:remove_item("main", stack)
+                        inv:remove_item("main", stack)
                         self.hp_max = self.hp_max + 10
                         if self.hp_max > 50 then self.hp_max = 50 end
                         hidroplane.setText(self)
@@ -451,7 +450,8 @@ minetest.register_entity("hidroplane:hidro", {
                     -- end painting
 
 			    else -- deal damage
-				    if not self.driver and toolcaps and toolcaps.damage_groups and toolcaps.damage_groups.fleshy and item_name ~= hidroplane.fuel then
+				    if not self.driver and toolcaps and toolcaps.damage_groups
+                            and toolcaps.damage_groups.fleshy and item_name ~= hidroplane.fuel then
 					    --mobkit.hurt(self,toolcaps.damage_groups.fleshy - 1)
 					    --mobkit.make_sound(self,'hit')
                         self.hp_max = self.hp_max - 10
@@ -500,7 +500,7 @@ minetest.register_entity("hidroplane:hidro", {
                     --=========================
                     -- eject passenger if the plane is on ground
                     local touching_ground, liquid_below = hidroplane.check_node_below(self.object)
-                    if self.isinliquid or touching_ground then --isn't flying?
+                    if self.isinliquid or touching_ground or liquid_below then --isn't flying?
                         --ok, remove pax
                         if self._passenger then
                             local passenger = minetest.get_player_by_name(self._passenger)

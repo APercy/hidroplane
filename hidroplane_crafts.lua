@@ -26,8 +26,8 @@ minetest.register_craftitem("hidroplane:hidro", {
 		end
         
         local pointed_pos = pointed_thing.under
-        local node_below = minetest.get_node(pointed_pos).name
-        local nodedef = minetest.registered_nodes[node_below]
+        --local node_below = minetest.get_node(pointed_pos).name
+        --local nodedef = minetest.registered_nodes[node_below]
         
 		pointed_pos.y=pointed_pos.y+3
 		local hidro = minetest.add_entity(pointed_pos, "hidroplane:hidro")

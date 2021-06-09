@@ -1,5 +1,6 @@
 hidroplane={}
-hidroplane.fuel = {['biofuel:biofuel'] = 1,['biofuel:bottle_fuel'] = 1,['biofuel:phial_fuel'] = 0.25, ['biofuel:fuel_can'] = 10}
+hidroplane.fuel = {['biofuel:biofuel'] = 1,['biofuel:bottle_fuel'] = 1,
+                ['biofuel:phial_fuel'] = 0.25, ['biofuel:fuel_can'] = 10}
 hidroplane.gravity = tonumber(minetest.settings:get("movement_gravity")) or 9.8
 hidroplane.wing_angle_of_attack = 3
 hidroplane.min_speed = 5
@@ -37,8 +38,6 @@ dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_manual.lua
 -- helpers and co.
 --
 
-local creative_exists = minetest.global_exists("creative")
-
 --
 -- items
 --
@@ -72,7 +71,7 @@ minetest.register_chatcommand("hydro_eject", {
             if parent ~= nil then
                 local entity = parent:get_luaentity()
                 if entity.driver_name == name and entity.name == "hidroplane:hidro" then
-                    motorboat.dettach(entity, player)
+                    hidroplane.dettach(entity, player)
                 else
 			        minetest.chat_send_player(name,colorstring)
                 end
@@ -80,7 +79,7 @@ minetest.register_chatcommand("hydro_eject", {
 		else
 			minetest.chat_send_player(name,colorstring)
 		end
-	end	
+	end
 })
 
 minetest.register_chatcommand("hydro_manual", {
@@ -89,6 +88,6 @@ minetest.register_chatcommand("hydro_manual", {
 	privs = {interact = true},
 	func = function(name, param)
         hidroplane.manual_formspec(name)
-	end	
+	end
 })
 

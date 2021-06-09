@@ -17,34 +17,9 @@ function hidroplane.minmax(v,m)
 	return math.min(math.abs(v),m)*hidroplane.sign(v)
 end
 
-local physics_attrs = {"jump", "speed", "gravity"}
-local function apply_physics_override(player, overrides)
-    if player_monoids then
-        for _, attr in pairs(physics_attrs) do
-            if overrides[attr] then
-                player_monoids[attr]:add_change(player, overrides[attr], "hangglider:glider")
-            end
-        end
-    else
-        player:set_physics_override(overrides)
-    end
-end
-
-local function remove_physics_override(player, overrides)
-    for _, attr in pairs(physics_attrs) do
-        if overrides[attr] then
-            if core.global_exists("player_monoids") then
-                player_monoids[attr]:del_change(player, "hangglider:glider")
-            else
-                player:set_physics_override({[attr] = 1})
-            end
-        end
-    end
-end
-
 --lift
 local function pitchroll2pitchyaw(aoa,roll)
-	if roll == 0.0 then return aoa,0 end 
+	if roll == 0.0 then return aoa,0 end
 	-- assumed vector x=0,y=0,z=1
 	local p1 = math.tan(aoa)
 	local y = math.cos(roll)*p1
@@ -66,18 +41,18 @@ function hidroplane.getLiftAccel(self, velocity, accel, longit_speed, roll, curr
         --local acc = 0.8
         local daoa = deg(angle_of_attack)
 
-    	--local curr_pos = self.object:get_pos()
-        local curr_percent_height = (100 - ((curr_pos.y * 100) / max_height))/100 --to decrease the lift coefficient at hight altitudes
+        --to decrease the lift coefficient at hight altitudes
+        local curr_percent_height = (100 - ((curr_pos.y * 100) / max_height))/100
 
 	    local rotation=self.object:get_rotation()
 	    local vrot = mobkit.dir_to_rot(velocity,rotation)
 	    
-	    hpitch,hyaw = pitchroll2pitchyaw(angle_of_attack,roll)
+	    local hpitch,hyaw = pitchroll2pitchyaw(angle_of_attack,roll)
 
 	    local hrot = {x=vrot.x+hpitch,y=vrot.y-hyaw,z=roll}
 	    local hdir = mobkit.rot_to_dir(hrot) --(hrot)
 	    local cross = vector.cross(velocity,hdir)
-	    local lift_dir = vector.normalize(vector.cross(cross,hdir))	
+	    local lift_dir = vector.normalize(vector.cross(cross,hdir))
 
         local lift_coefficient = (0.24*abs(daoa)*(1/(0.025*daoa+3))^4*math.sign(angle_of_attack))
         local lift_val = (lift*(vector.length(velocity)^2)*lift_coefficient)*curr_percent_height
@@ -120,7 +95,7 @@ function hidroplane.attach(self, player, instructor_mode)
     player_api.player_attached[name] = true
     -- make the driver sit
     minetest.after(0.2, function()
-        local player = minetest.get_player_by_name(name)
+        player = minetest.get_player_by_name(name)
         if player then
 	        player_api.set_animation(player, "sit")
             --apply_physics_override(player, {speed=0,gravity=0,jump=0})
@@ -144,7 +119,7 @@ function hidroplane.attach_pax(self, player)
     player_api.player_attached[name] = true
     -- make the driver sit
     minetest.after(0.2, function()
-        local player = minetest.get_player_by_name(name)
+        player = minetest.get_player_by_name(name)
         if player then
 	        player_api.set_animation(player, "sit")
             --apply_physics_override(player, {speed=0,gravity=0,jump=0})
@@ -205,7 +180,7 @@ function hidroplane.paint(self, object, colstr, search_string)
         local entity = object:get_luaentity()
         local l_textures = entity.initial_properties.textures
         for _, texture in ipairs(l_textures) do
-            local i,indx = texture:find(search_string)
+            local indx = texture:find(search_string)
             if indx then
                 l_textures[_] = search_string .."^[multiply:".. colstr
             end
@@ -224,7 +199,7 @@ function hidroplane.destroy(self)
     if self._passenger then
         -- detach the passenger
         local passenger = minetest.get_player_by_name(self._passenger)
-        if passenger then 
+        if passenger then
             hidroplane.dettach_pax(self, passenger)
         end
     end
@@ -321,24 +296,16 @@ function hidroplane.testImpact(self, velocity, position)
         local nodeb = mobkit.nodeatpos(mobkit.pos_shift(p,{z=-1}))
 		if (nodeu and nodeu.drawtype ~= 'airlike') or
             (noded and noded.drawtype ~= 'airlike') or
-            (nodef and nodef.drawtype ~= 'airlike') or 
-            (nodeb and nodeb.drawtype ~= 'airlike') or 
-            (noder and noder.drawtype ~= 'airlike') or 
+            (nodef and nodef.drawtype ~= 'airlike') or
+            (nodeb and nodeb.drawtype ~= 'airlike') or
+            (noder and noder.drawtype ~= 'airlike') or
             (nodel and nodel.drawtype ~= 'airlike') then
 			collision = true
 		end
-        local test = "nao"
-        if collision then test = "sim" end
-        --minetest.chat_send_all('- impact: '.. impact .. ' - draw: ' .. noded.drawtype .. ' - col: ' .. test)
-        --[[if collision then 
-            minetest.chat_send_all('- impact: '.. impact .. ' - hp: ' .. self.hp_max)
-        end]]--
     end
     if collision then
         local damage = impact / 2
         self.hp_max = self.hp_max - damage --subtract the impact value directly to hp meter
-        local curr_pos = self.object:get_pos()
-
         minetest.sound_play("hidroplane_collision", {
             --to_player = self.driver_name,
             object = self.object,
@@ -354,7 +321,7 @@ function hidroplane.testImpact(self, velocity, position)
 
             --minetest.chat_send_all('damage: '.. damage .. ' - hp: ' .. self.hp_max)
             if self.hp_max < 0 then --if acumulated damage is greater than 50, adieu
-                hidroplane.destroy(self)   
+                hidroplane.destroy(self)
             end
 
             local player = minetest.get_player_by_name(player_name)
@@ -378,28 +345,21 @@ end
 
 function hidroplane.checkattachBug(self)
     -- for some engine error the player can be detached from the submarine, so lets set him attached again
-    local can_stop = true
     if self.owner and self.driver_name then
         -- attach the driver again
         local player = minetest.get_player_by_name(self.owner)
         if player then
 		    if player:get_hp() > 0 then
                 hidroplane.attach(self, player, self._instruction_mode)
-                can_stop = false
             else
                 hidroplane.dettachPlayer(self, player)
 		    end
         else
-            if self._passenger ~= nil and self._command_is_given == false then hidroplane.transfer_control(self, true) end
+            if self._passenger ~= nil and self._command_is_given == false then
+                hidroplane.transfer_control(self, true)
+            end
         end
     end
-
-    --[[if can_stop then
-        if self.sound_handle ~= nil then
-            minetest.sound_stop(self.sound_handle)
-            self.sound_handle = nil
-        end
-    end]]--
 end
 
 function hidroplane.check_is_under_water(obj)
@@ -433,11 +393,20 @@ end
 function hidroplane.transfer_control(self, status)
     if status == false then
         self._command_is_given = false
-        if self._passenger then minetest.chat_send_player(self._passenger,core.colorize('#ff0000', " >>> The flight instructor got the control.")) end
-        if self.driver_name then minetest.chat_send_player(self.driver_name,core.colorize('#00ff00', " >>> The control is with you now.")) end
+        if self._passenger then
+            minetest.chat_send_player(self._passenger,
+                core.colorize('#ff0000', " >>> The flight instructor got the control."))
+        end
+        if self.driver_name then
+            minetest.chat_send_player(self.driver_name,
+                core.colorize('#00ff00', " >>> The control is with you now."))
+        end
     else
         self._command_is_given = true
-        if self._passenger then minetest.chat_send_player(self._passenger,core.colorize('#00ff00', " >>> The control is with you now.")) end
+        if self._passenger then
+            minetest.chat_send_player(self._passenger,
+                core.colorize('#00ff00', " >>> The control is with you now."))
+        end
         if self.driver_name then minetest.chat_send_player(self.driver_name," >>> The control was given.") end
     end
 end
@@ -452,7 +421,6 @@ function hidroplane.flightstep(self)
         local ctrl = player:get_player_control()
         -- change the driver
         if passenger and hidroplane.last_time_command >= 1 and self._instruction_mode == true then
-            local colorstring = ""
             if self._command_is_given == true then
                 if ctrl.sneak or ctrl.jump or ctrl.up or ctrl.down or ctrl.right or ctrl.left then
                     hidroplane.last_time_command = 0
@@ -483,7 +451,6 @@ function hidroplane.flightstep(self)
     local yaw = rotation.y
 	local newyaw=yaw
     local pitch = rotation.x
-    local newpitch = pitch
 	local roll = rotation.z
 	local newroll=roll
     if newroll > 360 then newroll = newroll - 360 end
@@ -495,10 +462,12 @@ function hidroplane.flightstep(self)
 
     local longit_speed = vector.dot(velocity,hull_direction)
     self._longit_speed = longit_speed
-    local longit_drag = vector.multiply(hull_direction,longit_speed*longit_speed*HIDROPLANE_LONGIT_DRAG_FACTOR*-1*hidroplane.sign(longit_speed))
+    local longit_drag = vector.multiply(hull_direction,longit_speed*
+            longit_speed*HIDROPLANE_LONGIT_DRAG_FACTOR*-1*hidroplane.sign(longit_speed))
 	local later_speed = hidroplane.dot(velocity,nhdir)
     --minetest.chat_send_all('later_speed: '.. later_speed)
-	local later_drag = vector.multiply(nhdir,later_speed*later_speed*HIDROPLANE_LATER_DRAG_FACTOR*-1*hidroplane.sign(later_speed))
+	local later_drag = vector.multiply(nhdir,later_speed*later_speed*
+            HIDROPLANE_LATER_DRAG_FACTOR*-1*hidroplane.sign(later_speed))
     local accel = vector.add(longit_drag,later_drag)
     local stop = false
 
@@ -530,12 +499,12 @@ function hidroplane.flightstep(self)
     -- pitch
     local speed_factor = 0
     if longit_speed > hidroplane.min_speed then speed_factor = (velocity.y * math.rad(2)) end
-    newpitch = math.rad(self._angle_of_attack) + speed_factor
+    local newpitch = math.rad(self._angle_of_attack) + speed_factor
 
     -- adjust pitch at ground
     if is_flying == false then --isn't flying?
         if math.abs(longit_speed) < hidroplane.min_speed - 2 then
-            local percentage = ((longit_speed * 100)/hidroplane.min_speed)/100
+            percentage = ((longit_speed * 100)/hidroplane.min_speed)/100
             if newpitch ~= 0 then
                 newpitch = newpitch * percentage
             end
@@ -556,10 +525,10 @@ function hidroplane.flightstep(self)
     end
     
     -- new yaw
-    local yaw_turn = 0
-	if math.abs(self._rudder_angle)>5 then 
+	if math.abs(self._rudder_angle)>5 then
         local turn_rate = math.rad(14)
-        yaw_turn = self.dtime * math.rad(self._rudder_angle) * turn_rate * hidroplane.sign(longit_speed) * math.abs(longit_speed/2)
+        local yaw_turn = self.dtime * math.rad(self._rudder_angle) * turn_rate *
+                hidroplane.sign(longit_speed) * math.abs(longit_speed/2)
 		newyaw = yaw + yaw_turn
 	end
 
@@ -603,7 +572,8 @@ function hidroplane.flightstep(self)
         self._command_is_given = false
     end
     if is_attached or passenger then
-        accel, stop = hidroplane.control(self, self.dtime, hull_direction, longit_speed, longit_drag, later_speed, later_drag, accel, pilot, is_flying)
+        accel, stop = hidroplane.control(self, self.dtime, hull_direction,
+            longit_speed, longit_drag, later_speed, later_drag, accel, pilot, is_flying)
     end
 
     --end accell

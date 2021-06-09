@@ -1,6 +1,6 @@
 local min = math.min
 local abs = math.abs
-local deg = math.deg
+--local deg = math.deg
 
 function hidroplane.physics(self)
     local friction = 0.99
@@ -17,9 +17,9 @@ function hidroplane.physics(self)
 		local vnew = vector.new(vel)
 		
 		if not self.collided then						-- ugly workaround for inconsistent collisions
-			for _,k in ipairs({'y','z','x'}) do			
-				if vel[k]==0 and abs(self.lastvelocity[k])> 0.1 then 
-					vnew[k]=-self.lastvelocity[k]*self.springiness 
+			for _,k in ipairs({'y','z','x'}) do
+				if vel[k]==0 and abs(self.lastvelocity[k])> 0.1 then
+					vnew[k]=-self.lastvelocity[k]*self.springiness
 				end
 			end
 		end

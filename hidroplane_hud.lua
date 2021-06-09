@@ -31,16 +31,6 @@ end
 function hidroplane.update_hud(player, climb, speed)
     local player_name = player:get_player_name()
 
-	hour = minetest.env:get_timeofday() * 24
-	hour = math.floor(hour)
-    
-    -- Get the dig and place count from storage, or default to 0
-    local meta        = player:get_meta()
-    local time_text   = "Time of day: " .. hour .. "h "
-    local pos = player:get_pos()
-    local altitude = math.floor(pos.y)
-    local altitude_text = "Altitude: " .. math.ceil(altitude)
-
     local screen_pos_y = -150
     local screen_pos_x = 10
 

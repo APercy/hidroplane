@@ -201,8 +201,7 @@ function getAdjustFactor(curr_y, desired_y)
     return (difference * adjust_factor) / max_difference
 end
 
-function hidroplane.autopilot(self, dtime, hull_direction,
-        longit_speed, longit_drag, later_speed, later_drag, accel, pilot, is_flying, curr_pos)
+function hidroplane.autopilot(self, dtime, hull_direction, longit_speed, accel, curr_pos)
 
     local retval_accel = accel
 

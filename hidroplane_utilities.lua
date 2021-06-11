@@ -606,8 +606,7 @@ function hidroplane.flightstep(self)
             accel, stop = hidroplane.control(self, self.dtime, hull_direction,
                 longit_speed, longit_drag, later_speed, later_drag, accel, pilot, is_flying)
         else
-            accel = hidroplane.autopilot(self, self.dtime, hull_direction,
-                longit_speed, longit_drag, later_speed, later_drag, accel, pilot, is_flying, curr_pos)
+            accel = hidroplane.autopilot(self, self.dtime, hull_direction, longit_speed, accel, curr_pos)
         end
     end
 

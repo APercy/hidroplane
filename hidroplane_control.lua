@@ -1,7 +1,8 @@
 --global constants
-hidroplane.last_time_command = 0
 hidroplane.vector_up = vector.new(0, 1, 0)
 hidroplane.ideal_step = 0.02
+hidroplane.rudder_limit = 30
+hidroplane.elevator_limit = 40
 
 dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_utilities.lua")
 
@@ -16,15 +17,41 @@ function hidroplane.check_node_below(obj)
 	return touching_ground, liquid_below
 end
 
+function hidroplane.powerAdjust(self,dtime,factor,dir,max_power)
+    local max = max_power or 100
+    local add_factor = factor
+    add_factor = add_factor * (dtime/hidroplane.ideal_step) --adjusting the command speed by dtime
+    local power_index = self._power_lever
+
+    if dir == 1 then
+        if self._power_lever < max then
+            self._power_lever = self._power_lever + add_factor
+        end
+        if self._power_lever > max then
+            self._power_lever = max
+        end
+    end
+    if dir == -1 then
+        if self._power_lever > 0 then
+            self._power_lever = self._power_lever - add_factor
+            if self._power_lever < 0 then self._power_lever = 0 end
+        end
+        if self._power_lever <= 0 then
+            self._power_lever = 0
+        end
+    end
+    if power_index ~= self._power_lever then
+        hidroplane.engineSoundPlay(self)
+    end
+
+end
+
 function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_drag,
                             later_speed, later_drag, accel, player, is_flying)
-    hidroplane.last_time_command = hidroplane.last_time_command + dtime
     if hidroplane.last_time_command > 1 then hidroplane.last_time_command = 1 end
     --if self.driver_name == nil then return end
     local retval_accel = accel
 
-    local rudder_limit = 30
-    local elevator_limit = 40
     local stop = false
 
 	-- player control
@@ -36,6 +63,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
             hidroplane.last_time_command = 0
 		    if self._engine_running then
 			    self._engine_running = false
+                self._autopilot = false
 		        -- sound and animation
                 if self.sound_handle then
                     minetest.sound_stop(self.sound_handle)
@@ -46,10 +74,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 		    elseif self._engine_running == false and self._energy > 0 then
 			    self._engine_running = true
 	            -- sound and animation
-                self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
-	                {object = self.object, gain = 2.0,
-                        pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32,
-                        loop = true,})
+                hidroplane.engineSoundPlay(self)
                 self.engine:set_animation_frame_speed(60)
 		    end
         end
@@ -60,32 +85,15 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
             local engineacc = (self._power_lever * hidroplane.max_engine_acc) / 100;
             self.engine:set_animation_frame_speed(60 + self._power_lever)
 
-            local add_factor = 1
-            add_factor = add_factor * (dtime/hidroplane.ideal_step) --adjusting the command speed by dtime
+            local factor = 1
 
             --increase power lever
             if ctrl.jump then
-                if self._power_lever < 100 then
-                    self._power_lever = self._power_lever + add_factor
-                end
-                if self._power_lever > 100 then
-                    self._power_lever = 100
-                    engineacc = hidroplane.max_engine_acc
-                else
-                    --sound
-                    minetest.sound_stop(self.sound_handle)
-                    self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
-	                    {object = self.object, gain = 2.0,
-                            pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32,
-                            loop = true,})
-                end
+                hidroplane.powerAdjust(self, dtime, factor, 1)
             end
             --decrease power lever
             if ctrl.sneak then
-                if self._power_lever > 0 then
-                    self._power_lever = self._power_lever - add_factor
-                    if self._power_lever < 0 then self._power_lever = 0 end
-                end
+                hidroplane.powerAdjust(self, dtime, factor, -1)
                 if self._power_lever <= 0 and is_flying == false then
                     --break
                     if longit_speed >= 0.1 then
@@ -97,13 +105,6 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
                     if abs(longit_speed) < 0.1 then
                         stop = true
                     end
-                else
-                    --sound
-                    minetest.sound_stop(self.sound_handle)
-                    self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
-		                {object = self.object, gain = 2.0,
-                            pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32,
-                            loop = true,})
                 end
             end
             --do not exceed
@@ -128,21 +129,14 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
         retval_accel=vector.add(retval_accel,hull_acc)
 
         --pitch
-        local pitch_factor = 10
-		if ctrl.down then
-			self._elevator_angle = math.max(self._elevator_angle-pitch_factor*dtime,-elevator_limit)
-		elseif ctrl.up then
-            if self._angle_of_attack < 0 then pitch_factor = 1 end --lets reduce the command power to avoid accidents
-			self._elevator_angle = math.min(self._elevator_angle+pitch_factor*dtime,elevator_limit)
-		end
+        local pitch_cmd = 0
+        if ctrl.up then pitch_cmd = 1 elseif ctrl.down then pitch_cmd = -1 end
+        hidroplane.set_pitch(self, pitch_cmd, dtime)
 
 		-- yaw
-        local yaw_factor = 30
-		if ctrl.right then
-			self._rudder_angle = math.max(self._rudder_angle-yaw_factor*dtime,-rudder_limit)
-		elseif ctrl.left then
-			self._rudder_angle = math.min(self._rudder_angle+yaw_factor*dtime,rudder_limit)
-		end
+        local yaw_cmd = 0
+        if ctrl.right then yaw_cmd = 1 elseif ctrl.left then yaw_cmd = -1 end
+        hidroplane.set_yaw(self, yaw_cmd, dtime)
 
         --I'm desperate, center all!
         if ctrl.right and ctrl.left then
@@ -152,19 +146,109 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 	end
 
     if longit_speed > 0 then
-        local factor = 1
-        if self._rudder_angle > 0 then factor = -1 end
-        local correction = (rudder_limit*(longit_speed/1000)) * factor
-        self._rudder_angle = self._rudder_angle + correction
-
-        factor = 1
-        --if self._elevator_angle > -1.5 then factor = -1 end --here is the "compensator" adjusto to keep it stable
-        if self._elevator_angle > 0 then factor = -1 end
-        correction = (elevator_limit/10) * factor * dtime
-        self._elevator_angle = self._elevator_angle + correction
+        hidroplane.rudder_elevator_auto_correction(self, longit_speed, dtime)
     end
 
     return retval_accel, stop
 end
 
+function hidroplane.set_pitch(self, dir, dtime)
+    local pitch_factor = 10
+	if dir == -1 then
+		self._elevator_angle = math.max(self._elevator_angle-pitch_factor*dtime,-hidroplane.elevator_limit)
+	elseif dir == 1 then
+        if self._angle_of_attack < 0 then pitch_factor = 1 end --lets reduce the command power to avoid accidents
+		self._elevator_angle = math.min(self._elevator_angle+pitch_factor*dtime,hidroplane.elevator_limit)
+	end
+end
 
+function hidroplane.set_yaw(self, dir, dtime)
+    local yaw_factor = 30
+	if dir == 1 then
+		self._rudder_angle = math.max(self._rudder_angle-yaw_factor*dtime,-hidroplane.rudder_limit)
+	elseif dir == -1 then
+		self._rudder_angle = math.min(self._rudder_angle+yaw_factor*dtime,hidroplane.rudder_limit)
+	end
+end
+
+function hidroplane.rudder_elevator_auto_correction(self, longit_speed, dtime)
+    local factor = 1
+    if self._rudder_angle > 0 then factor = -1 end
+    local correction = (hidroplane.rudder_limit*(longit_speed/1000)) * factor
+    self._rudder_angle = self._rudder_angle + correction
+
+    factor = 1
+    --if self._elevator_angle > -1.5 then factor = -1 end --here is the "compensator" adjusto to keep it stable
+    if self._elevator_angle > 0 then factor = -1 end
+    correction = (hidroplane.elevator_limit/10) * factor * dtime
+    self._elevator_angle = self._elevator_angle + correction
+end
+
+function hidroplane.engineSoundPlay(self)
+    --sound
+    if self.sound_handle then minetest.sound_stop(self.sound_handle) end
+    self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
+        {object = self.object, gain = 2.0,
+            pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 32,
+            loop = true,})
+end
+
+function getAdjustFactor(curr_y, desired_y)
+    local max_difference = 0.1
+    local adjust_factor = 0.5
+    local difference = math.abs(curr_y - desired_y)
+    if difference > max_difference then difference = max_difference end
+    return (difference * adjust_factor) / max_difference
+end
+
+function hidroplane.autopilot(self, dtime, hull_direction,
+        longit_speed, longit_drag, later_speed, later_drag, accel, pilot, is_flying, curr_pos)
+
+    local retval_accel = accel
+
+    local max_autopilot_power = 85
+    local max_attack_angle = 1.8
+
+    self._acceleration = 0
+    if self._engine_running then
+        --engine acceleration calc
+        local engineacc = (self._power_lever * hidroplane.max_engine_acc) / 100;
+        self.engine:set_animation_frame_speed(60 + self._power_lever)
+
+        local factor = getAdjustFactor(curr_pos.y, self._auto_pilot_altitude)
+        --increase power lever
+        if self._auto_pilot_altitude < curr_pos.y then
+            hidroplane.powerAdjust(self, dtime, factor, -1)
+        end
+        --decrease power lever
+        if self._auto_pilot_altitude > curr_pos.y then
+            hidroplane.powerAdjust(self, dtime, factor, 1, max_autopilot_power)
+        end
+        --do not exceed
+        local max_speed = 6
+        if longit_speed > max_speed then
+            engineacc = engineacc - (longit_speed-max_speed)
+            if engineacc < 0 then engineacc = 0 end
+        end
+        self._acceleration = engineacc
+    end
+
+    local hull_acc = vector.multiply(hull_direction,self._acceleration)
+    retval_accel=vector.add(retval_accel,hull_acc)
+
+    --pitch
+    if self._angle_of_attack > max_attack_angle then
+        hidroplane.set_pitch(self, 1, dtime)
+    elseif self._angle_of_attack < max_attack_angle then
+        hidroplane.set_pitch(self, -1, dtime)
+    end
+
+	-- yaw
+    hidroplane.set_yaw(self, 0, dtime)
+
+    if longit_speed > 0 then
+        hidroplane.rudder_elevator_auto_correction(self, longit_speed, dtime)
+    end
+
+    return retval_accel
+end

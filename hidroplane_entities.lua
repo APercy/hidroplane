@@ -278,6 +278,8 @@ minetest.register_entity("hidroplane:hidro", {
     _show_hud = false,
     _instruction_mode = false, --flag to intruction mode
     _command_is_given = false, --flag to mark the "owner" of the commands now
+    _autopilot = false,
+    _auto_pilot_altitude = 0,
 
     get_staticdata = function(self) -- unloaded/unloads ... is now saved
         return minetest.serialize({
@@ -509,6 +511,7 @@ minetest.register_entity("hidroplane:hidro", {
                     else
                         --give the control to the pax
                         if self._passenger then
+                            self._autopilot = false
                             hidroplane.transfer_control(self, true)
                         end
                     end

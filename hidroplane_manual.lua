@@ -37,8 +37,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
                 "* Forward: go down flying - nose down \n",
                 "* Left/right: Turn to left/right, work on and out ground. \n",
                 "* Left and Right together: center all commands \n",
-                "* Sneak and Jump together: give/take the controls to/from \n",
-                "      pilot student \n",
+                "* Sneak and Jump together (normal): activates de autopilot \n",
+                "* Sneak and Jump together (instruction mode): give/take the \n",
+                "      controls to/from pilot student \n",
                 "* Up and Down together: enable/disable HUD"
 			}
 			local shortcut_form = table.concat({
@@ -106,15 +107,16 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				"automatically extend. \n",
 				"When boarding the aircraft, centralize the commands (A  \n",
 				"and D keys), press E to start the engine and hold Jump  \n",
-				"until the power reaches maximum. When the speed  \n",
-				"reaches the green range, lightly pull the stick using the S  \n",
-				"key. Always keep the speed within the green range to \n",
-                "avoid stalling. To land, remove all power, but keep the \n",
-                "speed at the limit between the green and white range, \n",
-                "still in the green. When you are about to touch the soil or \n",
-                "water, lightly pull the stick to level and touch it gently. \n",
-                "It's possible to operate with an external camera, \n",
-                "activating the HUD. \n",
+				"until full power. When the speed reaches the green range, \n",
+				"lightly pull the stick using the S key. Always keep the \n",
+				"speed within the green range to avoid stalling. To land, \n",
+                "remove all power, but keep the speed at the limit \n",
+                "between the green and white range. \n",
+                "When you are about to touch the soil or water, lightly pull \n",
+                "the stick to level and touch it gently. It's possible to \n",
+                "operate with an external camera, activating the HUD. \n",
+                "The autopilot (jump and sneak) only keeps the airplane at the \n",
+                "activation level, limited by power and designed ceiling. \n",
                 "It's possible for a passenger to board the aircraft, just \n",
                 "click the right button on the floater. But the passenger \n",
                 "will only be able to enter if the pilot has already boarded."
@@ -124,7 +126,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				"size[16,10]",
 				"background[-0.7,-0.5;17.5,11.5;hidroplane_manual_bg.png]",
                 "image[0.5,1.75;6,6;hidroplane_manual_side_view.png]",
-				"label[9.25,0.5;", table.concat(text, ""), "]",
+				"label[9.25,0.25;", table.concat(text, ""), "]",
 			}, "")
 			minetest.show_formspec(player:get_player_name(), "hidroplane:op", op_form)
 		end

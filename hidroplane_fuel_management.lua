@@ -48,6 +48,7 @@ function hidroplane.consumptionCalc(self, accel)
     end
     if self._energy <= 0 and self._engine_running and accel ~= nil then
         self._engine_running = false
+        self._autopilot = false
         if self.sound_handle then minetest.sound_stop(self.sound_handle) end
 	    self.engine:set_animation_frame_speed(0)
     end

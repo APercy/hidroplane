@@ -356,6 +356,7 @@ function hidroplane.checkattachBug(self)
 		    end
         else
             if self._passenger ~= nil and self._command_is_given == false then
+                self._autopilot = false
                 hidroplane.transfer_control(self, true)
             end
         end
@@ -412,6 +413,14 @@ function hidroplane.transfer_control(self, status)
 end
 
 function hidroplane.flightstep(self)
+    local velocity = self.object:get_velocity()
+    --hack to avoid glitches
+    self.object:set_velocity(velocity)
+    local curr_pos = self.object:get_pos()
+    self.object:set_pos(curr_pos)
+
+
+    hidroplane.last_time_command = hidroplane.last_time_command + self.dtime
     local player = nil
     if self.driver_name then player = minetest.get_player_by_name(self.driver_name) end
     local passenger = nil
@@ -419,7 +428,9 @@ function hidroplane.flightstep(self)
 
     if player then
         local ctrl = player:get_player_control()
+        ---------------------
         -- change the driver
+        ---------------------
         if passenger and hidroplane.last_time_command >= 1 and self._instruction_mode == true then
             if self._command_is_given == true then
                 if ctrl.sneak or ctrl.jump or ctrl.up or ctrl.down or ctrl.right or ctrl.left then
@@ -435,7 +446,28 @@ function hidroplane.flightstep(self)
                 end
             end
         end
+        -----------
+        --autopilot
+        -----------
+        if self._instruction_mode == false and hidroplane.last_time_command >= 1 then
+            if self._autopilot == true then
+                if ctrl.sneak or ctrl.jump or ctrl.up or ctrl.down or ctrl.right or ctrl.left then
+                    hidroplane.last_time_command = 0
+                    self._autopilot = false
+                    minetest.chat_send_player(self.driver_name," >>> Autopilot deactivated")
+                end
+            else
+                if ctrl.sneak == true and ctrl.jump == true then
+                    hidroplane.last_time_command = 0
+                    self._autopilot = true
+                    self._auto_pilot_altitude = curr_pos.y
+                    minetest.chat_send_player(self.driver_name,core.colorize('#00ff00', " >>> Autopilot on"))
+                end
+            end
+        end
+        ----------------------------------
         -- shows the hud for the player
+        ----------------------------------
         if ctrl.up == true and ctrl.down == true and hidroplane.last_time_command >= 1 then
             hidroplane.last_time_command = 0
             if self._show_hud == true then
@@ -456,7 +488,6 @@ function hidroplane.flightstep(self)
     if newroll > 360 then newroll = newroll - 360 end
     if newroll < -360 then newroll = newroll + 360 end
 
-    local velocity = self.object:get_velocity()
     local hull_direction = mobkit.rot_to_dir(rotation) --minetest.yaw_to_dir(yaw)
     local nhdir = {x=hull_direction.z,y=0,z=-hull_direction.x}		-- lateral unit vector
 
@@ -470,11 +501,6 @@ function hidroplane.flightstep(self)
             HIDROPLANE_LATER_DRAG_FACTOR*-1*hidroplane.sign(later_speed))
     local accel = vector.add(longit_drag,later_drag)
     local stop = false
-
-    --hack to avoid glitches
-    self.object:set_velocity(velocity)
-    local curr_pos = self.object:get_pos()
-    self.object:set_pos(curr_pos)
 
     local node_bellow = mobkit.nodeatpos(mobkit.pos_shift(curr_pos,{y=-3}))
     local is_flying = true
@@ -495,6 +521,8 @@ function hidroplane.flightstep(self)
         self._angle_of_attack = 20
         self._elevator_angle = self._elevator_angle + 0.1
     end --limiting the very high climb angle due to strange behavior]]--
+
+    --minetest.chat_send_all(self._angle_of_attack)
 
     -- pitch
     local speed_factor = 0
@@ -558,8 +586,6 @@ function hidroplane.flightstep(self)
     ---------------------------------
     -- end roll
 
-    --accell calculation
-    --control
 	if not is_attached then
         -- for some engine error the player can be detached from the machine, so lets set him attached again
         hidroplane.checkattachBug(self)
@@ -571,9 +597,18 @@ function hidroplane.flightstep(self)
     else
         self._command_is_given = false
     end
+
+    ------------------------------------------------------
+    --accell calculation block
+    ------------------------------------------------------
     if is_attached or passenger then
-        accel, stop = hidroplane.control(self, self.dtime, hull_direction,
-            longit_speed, longit_drag, later_speed, later_drag, accel, pilot, is_flying)
+        if self._autopilot ~= true then
+            accel, stop = hidroplane.control(self, self.dtime, hull_direction,
+                longit_speed, longit_drag, later_speed, later_drag, accel, pilot, is_flying)
+        else
+            accel = hidroplane.autopilot(self, self.dtime, hull_direction,
+                longit_speed, longit_drag, later_speed, later_drag, accel, pilot, is_flying, curr_pos)
+        end
     end
 
     --end accell
@@ -605,6 +640,9 @@ function hidroplane.flightstep(self)
     elseif stop == false then
         self.object:set_velocity({x=0,y=0,z=0})
     end
+    ------------------------------------------------------
+    -- end accell
+    ------------------------------------------------------
 
     --self.object:get_luaentity() --hack way to fix jitter on climb
 

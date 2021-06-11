@@ -55,7 +55,7 @@ function hidroplane.getLiftAccel(self, velocity, accel, longit_speed, roll, curr
 	    local lift_dir = vector.normalize(vector.cross(cross,hdir))
 
         local lift_coefficient = (0.24*abs(daoa)*(1/(0.025*daoa+3))^4*math.sign(angle_of_attack))
-        local lift_val = (lift*(vector.length(velocity)^2)*lift_coefficient)*curr_percent_height
+        local lift_val = math.abs((lift*(vector.length(velocity)^2)*lift_coefficient)*curr_percent_height)
         --minetest.chat_send_all('lift: '.. lift_val)
 
         local lift_acc = vector.multiply(lift_dir,lift_val)
@@ -513,8 +513,8 @@ function hidroplane.flightstep(self)
     local percentage = math.abs(((longit_speed * 100)/(hidroplane.min_speed + 5))/100)
     if percentage > 1.5 then percentage = 1.5 end
     self._angle_of_attack = self._angle_of_attack - ((self._elevator_angle / 20)*percentage)
-    if self._angle_of_attack < -3 then
-        self._angle_of_attack = -1
+    if self._angle_of_attack < -0.5 then
+        self._angle_of_attack = -0.1
         self._elevator_angle = self._elevator_angle - 0.1
     end --limiting the negative angle]]--
     if self._angle_of_attack > 20 then

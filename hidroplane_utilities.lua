@@ -573,6 +573,7 @@ function hidroplane.flightstep(self)
         newroll = (prsr*math.rad(rollfactor)) * (later_speed * roll_rate) * hidroplane.sign(longit_speed)
         --minetest.chat_send_all('newroll: '.. newroll)
     else
+        delta = 0.2
         if roll > 0 then
             newroll = roll - delta
             if newroll < 0 then newroll = 0 end
@@ -629,7 +630,7 @@ function hidroplane.flightstep(self)
     end
 
     local new_accel = accel
-    if longit_speed > 2 then
+    if longit_speed > 1.5 then
         new_accel = hidroplane.getLiftAccel(self, velocity, new_accel, longit_speed, roll, curr_pos)
     end
     -- end lift

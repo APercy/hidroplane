@@ -175,13 +175,17 @@ function hidroplane.rudder_elevator_auto_correction(self, longit_speed, dtime)
     local factor = 1
     if self._rudder_angle > 0 then factor = -1 end
     local correction = (hidroplane.rudder_limit*(longit_speed/1000)) * factor
+    local before_correction = self._rudder_angle
     self._rudder_angle = self._rudder_angle + correction
+    if math.sign(before_correction) ~= math.sign(self._rudder_angle) then self._rudder_angle = 0 end
 
     factor = 1
     --if self._elevator_angle > -1.5 then factor = -1 end --here is the "compensator" adjusto to keep it stable
     if self._elevator_angle > 0 then factor = -1 end
     correction = (hidroplane.elevator_limit/10) * factor * dtime
+    before_correction = self._elevator_angle
     self._elevator_angle = self._elevator_angle + correction
+    if math.sign(before_correction) ~= math.sign(self._elevator_angle) then self._elevator_angle = 0 end
 end
 
 function hidroplane.engineSoundPlay(self)

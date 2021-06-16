@@ -37,7 +37,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
                 "* Forward: go down flying - nose down \n",
                 "* Left/right: Turn to left/right, work on and out ground. \n",
                 "* Left and Right together: center all commands \n",
-                "* Sneak and Jump together (normal): activates de autopilot \n",
+                "* Sneak and Jump together (normal): activates the autopilot \n",
                 "* Sneak and Jump together (instruction mode): give/take the \n",
                 "      controls to/from pilot student \n",
                 "* Up and Down together: enable/disable HUD"

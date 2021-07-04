@@ -280,6 +280,7 @@ minetest.register_entity("hidroplane:hidro", {
     _command_is_given = false, --flag to mark the "owner" of the commands now
     _autopilot = false,
     _auto_pilot_altitude = 0,
+    _last_accell = {x=0,y=0,z=0},
 
     get_staticdata = function(self) -- unloaded/unloads ... is now saved
         return minetest.serialize({
@@ -384,7 +385,34 @@ minetest.register_entity("hidroplane:hidro", {
 		self.object:set_armor_groups({immortal=1})
 	end,
 
-    on_step = mobkit.stepfunc,
+    --on_step = mobkit.stepfunc,
+    on_step = function(self,dtime,colinfo)
+	    self.dtime = math.min(dtime,0.2)
+	    self.colinfo = colinfo
+	    self.height = mobkit.get_box_height(self)
+	    
+    --  physics comes first
+	    local vel = self.object:get_velocity()
+	    
+	    if colinfo then 
+		    self.isonground = colinfo.touching_ground
+	    else
+		    if self.lastvelocity.y==0 and vel.y==0 then
+			    self.isonground = true
+		    else
+			    self.isonground = false
+		    end
+	    end
+	    
+	    self:physics()
+
+	    if self.logic then
+		    self:logic()
+	    end
+	    
+	    self.lastvelocity = self.object:get_velocity()
+	    self.time_total=self.time_total+self.dtime
+    end,
     logic = hidroplane.flightstep,
 
 	on_punch = function(self, puncher, ttime, toolcaps, dir, damage)

@@ -59,7 +59,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 		local ctrl = player:get_player_control()
 
         --engine and power control
-        if ctrl.aux1 and hidroplane.last_time_command > 0.3 then
+        if ctrl.aux1 and hidroplane.last_time_command > 0.5 then
             hidroplane.last_time_command = 0
 		    if self._engine_running then
 			    self._engine_running = false

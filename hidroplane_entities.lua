@@ -419,8 +419,13 @@ minetest.register_entity("hidroplane:hidro", {
 		if not puncher or not puncher:is_player() then
 			return
 		end
+
+        local is_admin = false
+        is_admin = minetest.check_player_privs(puncher, {server=true})
 		local name = puncher:get_player_name()
-        if self.owner and self.owner ~= name and self.owner ~= "" then return end
+        if self.owner and self.owner ~= name and self.owner ~= "" then
+            if is_admin == false then return end
+        end
         if self.owner == nil then
             self.owner = name
         end

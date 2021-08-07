@@ -301,6 +301,9 @@ function hidroplane.testImpact(self, velocity, position)
             (noder and noder.drawtype ~= 'airlike') or
             (nodel and nodel.drawtype ~= 'airlike') then
 			collision = true
+        else
+            --reset the speed to the last, because the forced stop was caused by lag
+            self.object:set_velocity(self._last_vel)
 		end
     end
     if collision then

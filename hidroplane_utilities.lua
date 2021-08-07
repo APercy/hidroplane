@@ -295,16 +295,24 @@ function hidroplane.testImpact(self, velocity, position)
         local nodef = mobkit.nodeatpos(mobkit.pos_shift(p,{z=1}))
         local nodeb = mobkit.nodeatpos(mobkit.pos_shift(p,{z=-1}))
 		if (nodeu and nodeu.drawtype ~= 'airlike') or
-            (noded and noded.drawtype ~= 'airlike') or
             (nodef and nodef.drawtype ~= 'airlike') or
             (nodeb and nodeb.drawtype ~= 'airlike') or
             (noder and noder.drawtype ~= 'airlike') or
             (nodel and nodel.drawtype ~= 'airlike') then
 			collision = true
-        else
-            --reset the speed to the last, because the forced stop was caused by lag
-            self.object:set_velocity(self._last_vel)
 		end
+
+        --lets calculate the vertical speed, to avoid the bug on colliding on floor with hard lag
+        if abs(velocity.y - self._last_vel.y) > 2 then
+		    if (noded and noded.drawtype ~= 'airlike') then
+			    collision = true
+		    end
+        end
+        if collision == false then
+            self.object:set_velocity(self.lastvelocity)
+            mobkit.set_acceleration(self.object, self._last_accell)
+        end
+
     end
     if collision then
         local damage = impact / 2

@@ -281,13 +281,23 @@ function hidroplane.setText(self)
 end
 
 function hidroplane.testImpact(self, velocity, position)
+    local p = position --self.object:get_pos()
     local collision = false
     if self._last_vel == nil then return end
+    --lets calculate the vertical speed, to avoid the bug on colliding on floor with hard lag
+    if abs(velocity.y - self._last_vel.y) > 2 then
+		local noded = mobkit.nodeatpos(mobkit.pos_shift(p,{y=-2.8}))
+	    if (noded and noded.drawtype ~= 'airlike') then
+		    collision = true
+	    else
+            self.object:set_velocity(self._last_vel)
+            self.object:set_acceleration(self._last_accell)
+        end
+    end
     local impact = abs(hidroplane.get_hipotenuse_value(velocity, self._last_vel))
     --minetest.chat_send_all('impact: '.. impact .. ' - hp: ' .. self.hp_max)
     if impact > 2 then
         --minetest.chat_send_all('impact: '.. impact .. ' - hp: ' .. self.hp_max)
-        local p = position --self.object:get_pos()
 		local nodeu = mobkit.nodeatpos(mobkit.pos_shift(p,{y=1}))
 		local noded = mobkit.nodeatpos(mobkit.pos_shift(p,{y=-2.8}))
         local nodel = mobkit.nodeatpos(mobkit.pos_shift(p,{x=-1}))
@@ -301,20 +311,10 @@ function hidroplane.testImpact(self, velocity, position)
             (nodel and nodel.drawtype ~= 'airlike') then
 			collision = true
 		end
-
-        --lets calculate the vertical speed, to avoid the bug on colliding on floor with hard lag
-        if abs(velocity.y - self._last_vel.y) > 2 then
-		    if (noded and noded.drawtype ~= 'airlike') then
-			    collision = true
-		    end
-        end
-        if collision == false then
-            self.object:set_velocity(self.lastvelocity)
-            mobkit.set_acceleration(self.object, self._last_accell)
-        end
-
     end
+
     if collision then
+        --self.object:set_velocity({x=0,y=0,z=0})
         local damage = impact / 2
         self.hp_max = self.hp_max - damage --subtract the impact value directly to hp meter
         minetest.sound_play("hidroplane_collision", {

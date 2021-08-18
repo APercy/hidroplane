@@ -627,7 +627,7 @@ function hidroplane.flightstep(self)
     if accel == nil then accel = {x=0,y=0,z=0} end
 
     --lift calculation
-    --accel.y = accel.y + mobkit.gravity --accel_y
+    accel.y = accel.y + mobkit.gravity --accel_y
 
     --lets apply some bob in water
 	if self.isinliquid then

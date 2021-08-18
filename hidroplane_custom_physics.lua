@@ -60,14 +60,14 @@ function hidroplane.physics(self)
 		local buoyacc = mobkit.gravity*(self.buoyancy-submergence)
         local new_accell = self._last_accell
         new_accell.x = new_accell.x * self.water_drag
-        new_accell.y = new_accell.y + buoyacc-vel.y*abs(vel.y)*0.4
+        new_accell.y = (new_accell.y + buoyacc-vel.y*abs(vel.y)*0.4) - mobkit.gravity --(to prevent it dive)
         new_accell.z = new_accell.z * self.water_drag
 		--[[mobkit.set_acceleration(self.object,
 			{x=-vel.x*self.water_drag,y=buoyacc-vel.y*abs(vel.y)*0.4,z=-vel.z*self.water_drag})]]--
         mobkit.set_acceleration(self.object, new_accell)
 	else
 		self.isinliquid = false
-        new_accell.y = new_accell.y + mobkit.gravity
+        --new_accell.y = new_accell.y + mobkit.gravity
         self.object:set_acceleration(new_accell) --{x=0,y=mobkit.gravity,z=0})
 	end
 

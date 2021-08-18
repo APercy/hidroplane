@@ -172,7 +172,7 @@ function hidroplane.set_yaw(self, dir, dtime)
 end
 
 function hidroplane.rudder_elevator_auto_correction(self, longit_speed, dtime)
-    local factor = 1
+    local factor = 0.8
     if self._rudder_angle > 0 then factor = -1 end
     local correction = (hidroplane.rudder_limit*(longit_speed/1000)) * factor
     local before_correction = self._rudder_angle

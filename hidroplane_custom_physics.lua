@@ -1,3 +1,4 @@
+
 local min = math.min
 local abs = math.abs
 --local deg = math.deg
@@ -51,25 +52,19 @@ function hidroplane.physics(self)
 		snodepos.y = snodepos.y+1
 		surfnode = mobkit.nodeatpos(snodepos)
 	end
-    local new_accell = self._last_accell
 	self.isinliquid = surfnodename
 	if surface then				-- standing in liquid
 		self.isinliquid = true
 		local submergence = min(surface-spos.y,self.height)/self.height
 --		local balance = self.buoyancy*self.height
 		local buoyacc = mobkit.gravity*(self.buoyancy-submergence)
-        local new_accell = self._last_accell
-        new_accell.x = new_accell.x * self.water_drag
-        new_accell.y = (new_accell.y + buoyacc-vel.y*abs(vel.y)*0.4) - mobkit.gravity --(to prevent it dive)
-        new_accell.z = new_accell.z * self.water_drag
-		--[[mobkit.set_acceleration(self.object,
-			{x=-vel.x*self.water_drag,y=buoyacc-vel.y*abs(vel.y)*0.4,z=-vel.z*self.water_drag})]]--
-        mobkit.set_acceleration(self.object, new_accell)
+		mobkit.set_acceleration(self.object,
+			{x=-vel.x*self.water_drag,y=buoyacc-vel.y*abs(vel.y)*0.4,z=-vel.z*self.water_drag})
 	else
 		self.isinliquid = false
-        --new_accell.y = new_accell.y + mobkit.gravity
-        self.object:set_acceleration(new_accell) --{x=0,y=mobkit.gravity,z=0})
+	    self.object:set_acceleration({x=0,y=mobkit.gravity,z=0})
 	end
 
+    --self.object:set_acceleration({x=0,y=mobkit.gravity,z=0})
 
 end

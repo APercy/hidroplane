@@ -199,8 +199,12 @@ function hidroplane.elevator_auto_correction(self, longit_speed, dtime)
     if self._elevator_angle > 0 then factor = -1 end
     local correction = (hidroplane.elevator_limit*(longit_speed/10000)) * factor * (dtime/hidroplane.ideal_step)
     local before_correction = self._elevator_angle
-    self._elevator_angle = self._elevator_angle + correction
-    if math.sign(before_correction) ~= math.sign(self._elevator_angle) then self._elevator_angle = 0 end
+    local new_elevator_angle = self._elevator_angle + correction
+    if math.sign(before_correction) ~= math.sign(new_elevator_angle) then
+        self._elevator_angle = 0
+    else
+        self._elevator_angle = new_elevator_angle
+    end
 end
 
 function hidroplane.engineSoundPlay(self)

@@ -172,7 +172,7 @@ function hidroplane.set_pitch(self, dir, dtime)
 end
 
 function hidroplane.set_yaw(self, dir, dtime)
-    local yaw_factor = 25
+    local yaw_factor = 30
 	if dir == 1 then
 		self._rudder_angle = math.max(self._rudder_angle-yaw_factor*dtime,-hidroplane.rudder_limit)
 	elseif dir == -1 then
@@ -183,7 +183,7 @@ end
 function hidroplane.rudder_auto_correction(self, longit_speed, dtime)
     local factor = 1
     if self._rudder_angle > 0 then factor = -1 end
-    local correction = (hidroplane.rudder_limit*(longit_speed/1000)) * factor
+    local correction = (hidroplane.rudder_limit*(longit_speed/10)) * factor * dtime
     local before_correction = self._rudder_angle
     self._rudder_angle = self._rudder_angle + correction
     if math.sign(before_correction) ~= math.sign(self._rudder_angle) then self._rudder_angle = 0 end

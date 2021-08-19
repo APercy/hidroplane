@@ -53,10 +53,11 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
     local retval_accel = accel
 
     local stop = false
+    local ctrl = nil
 
 	-- player control
 	if player then
-		local ctrl = player:get_player_control()
+		ctrl = player:get_player_control()
 
         --engine and power control
         if ctrl.aux1 and hidroplane.last_time_command > 0.5 then
@@ -146,7 +147,15 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 	end
 
     if longit_speed > 0 then
-        hidroplane.rudder_elevator_auto_correction(self, longit_speed, dtime)
+        if ctrl then
+            if ctrl.right or ctrl.left then
+            else
+                hidroplane.rudder_auto_correction(self, longit_speed, dtime)
+            end
+        else
+            hidroplane.rudder_auto_correction(self, longit_speed, dtime)
+        end
+        hidroplane.elevator_auto_correction(self, longit_speed, dtime)
     end
 
     return retval_accel, stop
@@ -163,7 +172,7 @@ function hidroplane.set_pitch(self, dir, dtime)
 end
 
 function hidroplane.set_yaw(self, dir, dtime)
-    local yaw_factor = 30
+    local yaw_factor = 25
 	if dir == 1 then
 		self._rudder_angle = math.max(self._rudder_angle-yaw_factor*dtime,-hidroplane.rudder_limit)
 	elseif dir == -1 then
@@ -171,15 +180,17 @@ function hidroplane.set_yaw(self, dir, dtime)
 	end
 end
 
-function hidroplane.rudder_elevator_auto_correction(self, longit_speed, dtime)
-    local factor = 0.8
+function hidroplane.rudder_auto_correction(self, longit_speed, dtime)
+    local factor = 1
     if self._rudder_angle > 0 then factor = -1 end
     local correction = (hidroplane.rudder_limit*(longit_speed/1000)) * factor
     local before_correction = self._rudder_angle
     self._rudder_angle = self._rudder_angle + correction
     if math.sign(before_correction) ~= math.sign(self._rudder_angle) then self._rudder_angle = 0 end
+end
 
-    factor = 1
+function hidroplane.elevator_auto_correction(self, longit_speed, dtime)
+    local factor = 1
     --if self._elevator_angle > -1.5 then factor = -1 end --here is the "compensator" adjusto to keep it stable
     if self._elevator_angle > 0 then factor = -1 end
     correction = (hidroplane.elevator_limit/10) * factor * dtime

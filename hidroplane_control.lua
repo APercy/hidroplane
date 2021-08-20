@@ -269,7 +269,8 @@ function hidroplane.autopilot(self, dtime, hull_direction, longit_speed, accel, 
     hidroplane.set_yaw(self, 0, dtime)
 
     if longit_speed > 0 then
-        hidroplane.rudder_elevator_auto_correction(self, longit_speed, dtime)
+        hidroplane.rudder_auto_correction(self, longit_speed, dtime)
+        hidroplane.elevator_auto_correction(self, longit_speed, dtime)
     end
 
     return retval_accel

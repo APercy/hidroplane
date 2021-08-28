@@ -459,6 +459,8 @@ minetest.register_entity("hidroplane:hidro", {
                         self.hp_max = self.hp_max + 10
                         if self.hp_max > 50 then self.hp_max = 50 end
                         hidroplane.setText(self)
+                    else
+                        minetest.chat_send_player(puncher:get_player_name(), "You need steel ingots in your inventory to perform this repair.")
                     end
                 end
                 return

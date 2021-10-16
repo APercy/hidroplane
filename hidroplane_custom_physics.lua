@@ -6,12 +6,6 @@ local abs = math.abs
 function hidroplane.physics(self)
     local friction = 0.99
 	local vel=self.object:get_velocity()
-		-- dumb friction
-	if self.isonground and not self.isinliquid then
-		self.object:set_velocity({x=vel.x*friction,
-								y=vel.y,
-								z=vel.z*friction})
-	end
 	
 	-- bounciness
 	if self.springiness and self.springiness > 0 then
@@ -77,6 +71,13 @@ function hidroplane.physics(self)
 	end
 
     new_velocity = vector.add(new_velocity, vector.multiply(self._last_accell, self.dtime))
-    self.object:set_velocity(new_velocity)
+		-- dumb friction
+	if self.isonground and not self.isinliquid then
+		self.object:set_velocity({x=new_velocity.x*friction,
+								y=new_velocity.y,
+								z=new_velocity.z*friction})
+    else
+        self.object:set_velocity(new_velocity)
+	end
 
 end

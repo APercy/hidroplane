@@ -52,19 +52,31 @@ function hidroplane.physics(self)
 		snodepos.y = snodepos.y+1
 		surfnode = mobkit.nodeatpos(snodepos)
 	end
+
+    local new_velocity = nil
 	self.isinliquid = surfnodename
 	if surface then				-- standing in liquid
 		self.isinliquid = true
-		local submergence = min(surface-spos.y,self.height)/self.height
+        local height = self.height
+		local submergence = min(surface-spos.y,height)/height
 --		local balance = self.buoyancy*self.height
 		local buoyacc = mobkit.gravity*(self.buoyancy-submergence)
-		mobkit.set_acceleration(self.object,
-			{x=-vel.x*self.water_drag,y=buoyacc-vel.y*abs(vel.y)*0.4,z=-vel.z*self.water_drag})
+		--[[mobkit.set_acceleration(self.object,
+			{x=-vel.x*self.water_drag,y=buoyacc-vel.y*abs(vel.y)*0.4,z=-vel.z*self.water_drag})]]--
+        local accell = {x=-vel.x*self.water_drag,y=buoyacc-vel.y*abs(vel.y)*0.4,z=-vel.z*self.water_drag}
+        local v_accell = {x=-0,y=buoyacc-vel.y*abs(vel.y)*0.4,z=0}
+        mobkit.set_acceleration(self.object,v_accell)
+        new_velocity = vector.add(vel, vector.multiply(accell, self.dtime/8))
+        --self.object:set_velocity(new_velocity)
+        
 	else
+        mobkit.set_acceleration(self.object,{x=0,y=0,z=0})
 		self.isinliquid = false
-	    self.object:set_acceleration({x=0,y=mobkit.gravity,z=0})
+        new_velocity = vector.add(vel, {x=0,y=mobkit.gravity * self.dtime,z=0})
+        --self.object:set_velocity(new_velocity)
 	end
 
-    --self.object:set_acceleration({x=0,y=mobkit.gravity,z=0})
+    new_velocity = vector.add(new_velocity, vector.multiply(self._last_accell, self.dtime))
+    self.object:set_velocity(new_velocity)
 
 end

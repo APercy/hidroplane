@@ -290,6 +290,7 @@ minetest.register_entity("hidroplane:hidro", {
             stored_color = self._color,
             stored_power_lever = self._power_lever,
             stored_driver_name = self.driver_name,
+            stored_last_accell = self._last_accell,
         })
     end,
 
@@ -303,6 +304,7 @@ minetest.register_entity("hidroplane:hidro", {
             self._color = data.stored_color
             self._power_lever = data.stored_power_lever
             self.driver_name = data.stored_driver_name
+            self._last_accell = data.stored_last_accell
             --minetest.debug("loaded: ", self._energy)
         end
         hidroplane.setText(self)

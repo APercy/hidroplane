@@ -291,7 +291,8 @@ function hidroplane.testImpact(self, velocity, position)
 		    collision = true
 	    else
             self.object:set_velocity(self._last_vel)
-            self.object:set_acceleration(self._last_accell)
+            --self.object:set_acceleration(self._last_accell)
+            self.object:set_velocity(vector.add(velocity, vector.multiply(self._last_accell, self.dtime/8)))
         end
     end
     local impact = abs(hidroplane.get_hipotenuse_value(velocity, self._last_vel))
@@ -425,11 +426,7 @@ end
 
 function hidroplane.flightstep(self)
     local velocity = self.object:get_velocity()
-    --hack to avoid glitches
-    self.object:set_velocity(velocity)
     local curr_pos = self.object:get_pos()
-    self.object:set_pos(curr_pos)
-
 
     hidroplane.last_time_command = hidroplane.last_time_command + self.dtime
     local player = nil
@@ -542,7 +539,7 @@ function hidroplane.flightstep(self)
 
     -- adjust pitch at ground
     if is_flying == false then --isn't flying?
-        if math.abs(longit_speed) < hidroplane.min_speed - 2 then
+        if math.abs(longit_speed) < hidroplane.min_speed then
             percentage = ((longit_speed * 100)/hidroplane.min_speed)/100
             if newpitch ~= 0 then
                 newpitch = newpitch * percentage
@@ -580,7 +577,7 @@ function hidroplane.flightstep(self)
         local snormal = {x=sdir.z,y=0,z=-sdir.x}	-- rightside, dot is negative
         local prsr = hidroplane.dot(snormal,nhdir)
         local rollfactor = -90
-        local roll_rate = math.rad(25)
+        local roll_rate = math.rad(10)
         newroll = (prsr*math.rad(rollfactor)) * (later_speed * roll_rate) * hidroplane.sign(longit_speed)
         --minetest.chat_send_all('newroll: '.. newroll)
     else
@@ -648,8 +645,8 @@ function hidroplane.flightstep(self)
 
     if stop ~= true then
         self._last_accell = new_accel
-        self.object:set_acceleration(new_accel)
     elseif stop == false then
+        self.object:set_acceleration({x=0,y=0,z=0})
         self.object:set_velocity({x=0,y=0,z=0})
     end
     ------------------------------------------------------
@@ -659,7 +656,7 @@ function hidroplane.flightstep(self)
     --self.object:get_luaentity() --hack way to fix jitter on climb
 
     --adjust climb indicator
-    local climb_rate = velocity.y * 1.5
+    local climb_rate = velocity.y
     if climb_rate > 5 then climb_rate = 5 end
     if climb_rate < -5 then
         climb_rate = -5
@@ -694,9 +691,8 @@ function hidroplane.flightstep(self)
     self.power_gauge:set_attach(self.object,'',HIDROPLANE_GAUGE_POWER_POSITION,{x=0,y=0,z=power_indicator_angle})
 
     --apply rotations
-	if newyaw~=yaw or newpitch~=pitch or newroll~=roll then
-        self.object:set_rotation({x=newpitch,y=newyaw,z=newroll})
-    end
+    self.object:set_rotation({x=newpitch,y=newyaw,z=newroll})
+    --end
 
     --adjust elevator pitch (3d model)
     self.elevator:set_attach(self.object,'',{x=0,y=4,z=-35.5},{x=-self._elevator_angle*2,y=0,z=0})

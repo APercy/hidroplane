@@ -19,7 +19,7 @@ end
 
 function hidroplane.powerAdjust(self,dtime,factor,dir,max_power)
     local max = max_power or 100
-    local add_factor = factor
+    local add_factor = factor/2
     add_factor = add_factor * (dtime/hidroplane.ideal_step) --adjusting the command speed by dtime
     local power_index = self._power_lever
 
@@ -97,11 +97,13 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
                 hidroplane.powerAdjust(self, dtime, factor, -1)
                 if self._power_lever <= 0 and is_flying == false then
                     --break
-                    if longit_speed >= 0.1 then
+                    if longit_speed > 0 then
                         engineacc = -1
+                        if (longit_speed + engineacc) < 0 then engineacc = longit_speed * -1 end
                     end
-                    if longit_speed <= -0.1 then
+                    if longit_speed < 0 then
                         engineacc = 1
+                        if (longit_speed + engineacc) > 0 then engineacc = longit_speed * -1 end
                     end
                     if abs(longit_speed) < 0.1 then
                         stop = true
@@ -172,11 +174,11 @@ function hidroplane.set_pitch(self, dir, dtime)
 end
 
 function hidroplane.set_yaw(self, dir, dtime)
-    local yaw_factor = 30
+    local yaw_factor = 25
 	if dir == 1 then
-		self._rudder_angle = math.max(self._rudder_angle-yaw_factor*dtime,-hidroplane.rudder_limit)
+		self._rudder_angle = math.max(self._rudder_angle-(yaw_factor*dtime),-hidroplane.rudder_limit)
 	elseif dir == -1 then
-		self._rudder_angle = math.min(self._rudder_angle+yaw_factor*dtime,hidroplane.rudder_limit)
+		self._rudder_angle = math.min(self._rudder_angle+(yaw_factor*dtime),hidroplane.rudder_limit)
 	end
 end
 
@@ -216,6 +218,7 @@ function hidroplane.engineSoundPlay(self)
             loop = true,})
 end
 
+--obsolete, will be removed
 function getAdjustFactor(curr_y, desired_y)
     local max_difference = 0.1
     local adjust_factor = 0.5
@@ -231,19 +234,27 @@ function hidroplane.autopilot(self, dtime, hull_direction, longit_speed, accel, 
     local max_autopilot_power = 85
     local max_attack_angle = 1.8
 
+    --climb
+    local velocity = self.object:get_velocity()
+    local climb_rate = velocity.y * 1.5
+    if climb_rate > 5 then climb_rate = 5 end
+    if climb_rate < -5 then
+        climb_rate = -5
+    end
+
     self._acceleration = 0
     if self._engine_running then
         --engine acceleration calc
         local engineacc = (self._power_lever * hidroplane.max_engine_acc) / 100;
         self.engine:set_animation_frame_speed(60 + self._power_lever)
 
-        local factor = getAdjustFactor(curr_pos.y, self._auto_pilot_altitude)
+        local factor = math.abs(climb_rate * 0.5) --getAdjustFactor(curr_pos.y, self._auto_pilot_altitude)
         --increase power lever
-        if self._auto_pilot_altitude < curr_pos.y then
+        if climb_rate > 0.2 then
             hidroplane.powerAdjust(self, dtime, factor, -1)
         end
         --decrease power lever
-        if self._auto_pilot_altitude > curr_pos.y then
+        if climb_rate < 0 then
             hidroplane.powerAdjust(self, dtime, factor, 1, max_autopilot_power)
         end
         --do not exceed

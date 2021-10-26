@@ -628,7 +628,7 @@ function hidroplane.flightstep(self)
 
     --lets apply some bob in water
 	if self.isinliquid then
-        local bob = hidroplane.minmax(hidroplane.dot(accel,hull_direction),0.4)	-- vertical bobbing
+        local bob = hidroplane.minmax(hidroplane.dot(accel,hull_direction),0.2)	-- vertical bobbing
         accel.y = accel.y + bob
         local max_pitch = 6
         local h_vel_compensation = (((longit_speed * 4) * 100)/max_pitch)/100

@@ -261,6 +261,8 @@ minetest.register_entity("hidroplane:hidro", {
     static_save = true,
     infotext = "A nice hidroplane",
     hp_max = 50,
+    shaded = true,
+    show_on_minimap = true,
     buoyancy = 0.25,
     physics = hidroplane.physics,
     _passenger = nil,

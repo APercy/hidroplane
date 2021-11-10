@@ -66,7 +66,6 @@ function hidroplane.physics(self)
         --local v_accell = {x=0,y=buoyacc-(vel.y*abs(vel.y)*0.4),z=0}
         --mobkit.set_acceleration(self.object,v_accell)
         new_velocity = vector.add(vel, vector.multiply(accell, self.dtime))
-        --self.object:set_velocity(new_velocity)
         
 	else
         mobkit.set_acceleration(self.object,{x=0,y=0,z=0})

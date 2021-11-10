@@ -50,16 +50,21 @@ function hidroplane.physics(self)
     local new_velocity = nil
 	self.isinliquid = surfnodename
 	if surface then				-- standing in liquid
-		self.isinliquid = true
+        self.isinliquid = true
+    end
+
+    local accell = {x=0, y=0, z=0}
+    self.water_drag = 0.1
+    if self.isinliquid then
         local height = self.height
 		local submergence = min(surface-spos.y,height)/height
 --		local balance = self.buoyancy*self.height
 		local buoyacc = mobkit.gravity*(self.buoyancy-submergence)
 		--[[mobkit.set_acceleration(self.object,
 			{x=-vel.x*self.water_drag,y=buoyacc-vel.y*abs(vel.y)*0.4,z=-vel.z*self.water_drag})]]--
-        local accell = {x=-vel.x*self.water_drag,y=buoyacc-(vel.y*abs(vel.y)*0.4),z=-vel.z*self.water_drag}
-        local v_accell = {x=-0,y=buoyacc-vel.y*abs(vel.y)*0.4,z=0}
-        mobkit.set_acceleration(self.object,v_accell)
+        accell = {x=-vel.x*self.water_drag,y=buoyacc-(vel.y*abs(vel.y)*0.4),z=-vel.z*self.water_drag}
+        --local v_accell = {x=0,y=buoyacc-(vel.y*abs(vel.y)*0.4),z=0}
+        --mobkit.set_acceleration(self.object,v_accell)
         new_velocity = vector.add(vel, vector.multiply(accell, self.dtime))
         --self.object:set_velocity(new_velocity)
         

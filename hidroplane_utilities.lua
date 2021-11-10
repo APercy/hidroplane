@@ -631,7 +631,7 @@ function hidroplane.flightstep(self)
         local bob = hidroplane.minmax(hidroplane.dot(accel,hull_direction),0.2)	-- vertical bobbing
         accel.y = accel.y + bob
         local max_pitch = 6
-        local h_vel_compensation = (((longit_speed * 4) * 100)/max_pitch)/100
+        local h_vel_compensation = (((longit_speed * 2) * 100)/max_pitch)/100
         if h_vel_compensation < 0 then h_vel_compensation = 0 end
         if h_vel_compensation > max_pitch then h_vel_compensation = max_pitch end
         newpitch = newpitch + (velocity.y * math.rad(max_pitch - h_vel_compensation))

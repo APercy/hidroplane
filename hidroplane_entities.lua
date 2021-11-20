@@ -242,8 +242,8 @@ minetest.register_entity("hidroplane:hidro", {
 	initial_properties = {
 	    physical = true,
         collide_with_objects = true,
-	    collisionbox = {-1.2, -2.31, -1.2, 1.2, 1, 1.2}, --{-1,0,-1, 1,0.3,1},
-	    selectionbox = {-2, -2.31, -2, 2, -1, 2},
+	    collisionbox = {-1.2, -2.3, -1.2, 1.2, 1, 1.2}, --{-1,0,-1, 1,0.3,1},
+	    selectionbox = {-2, -2.3, -2, 2, -1, 2},
 	    visual = "mesh",
 	    mesh = "hidroplane_fuselage.b3d",
         stepheight = 0.5,

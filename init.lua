@@ -67,13 +67,15 @@ minetest.register_chatcommand("hydro_eject", {
         local attached_to = player:get_attach()
 
 		if attached_to ~= nil then
-            local parent = attached_to:get_attach()
-            if parent ~= nil then
-                local entity = parent:get_luaentity()
-                if entity.driver_name == name and entity.name == "hidroplane:hidro" then
-                    hidroplane.dettach(entity, player)
-                else
-			        minetest.chat_send_player(name,colorstring)
+            local seat = attached_to:get_attach()
+            if seat ~= nil then
+                local entity = seat:get_luaentity()
+                if entity then
+                    if entity.driver_name == name and entity.name == "hidroplane:hidro" then
+                        hidroplane.dettachPlayer(entity, player)
+                    else
+			            minetest.chat_send_player(name,colorstring)
+                    end
                 end
             end
 		else

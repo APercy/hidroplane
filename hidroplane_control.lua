@@ -40,10 +40,6 @@ function hidroplane.powerAdjust(self,dtime,factor,dir,max_power)
             self._power_lever = 0
         end
     end
-    if power_index ~= self._power_lever then
-        hidroplane.engineSoundPlay(self)
-    end
-
 end
 
 function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_drag,
@@ -65,18 +61,11 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 		    if self._engine_running then
 			    self._engine_running = false
                 self._autopilot = false
-		        -- sound and animation
-                if self.sound_handle then
-                    minetest.sound_stop(self.sound_handle)
-                    self.sound_handle = nil
-                end
-		        self.engine:set_animation_frame_speed(0)
                 self._power_lever = 0 --zero power
+                self._last_applied_power = 0 --zero engine
 		    elseif self._engine_running == false and self._energy > 0 then
 			    self._engine_running = true
-	            -- sound and animation
-                hidroplane.engineSoundPlay(self)
-                self.engine:set_animation_frame_speed(60)
+                self._last_applied_power = -1 --send signal to start
 		    end
         end
 
@@ -84,7 +73,6 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
         if self._engine_running then
             --engine acceleration calc
             local engineacc = (self._power_lever * hidroplane.max_engine_acc) / 100;
-            self.engine:set_animation_frame_speed(60 + self._power_lever)
 
             local factor = 1
 
@@ -209,15 +197,6 @@ function hidroplane.elevator_auto_correction(self, longit_speed, dtime)
     end
 end
 
-function hidroplane.engineSoundPlay(self)
-    --sound
-    if self.sound_handle then minetest.sound_stop(self.sound_handle) end
-    self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
-        {object = self.object, gain = 2.0,
-            pitch = 0.5 + ((self._power_lever/100)/2),max_hear_distance = 15,
-            loop = true,})
-end
-
 --obsolete, will be removed
 function getAdjustFactor(curr_y, desired_y)
     local max_difference = 0.1
@@ -246,7 +225,7 @@ function hidroplane.autopilot(self, dtime, hull_direction, longit_speed, accel, 
     if self._engine_running then
         --engine acceleration calc
         local engineacc = (self._power_lever * hidroplane.max_engine_acc) / 100;
-        self.engine:set_animation_frame_speed(60 + self._power_lever)
+        --self.engine:set_animation_frame_speed(60 + self._power_lever)
 
         local factor = math.abs(climb_rate * 0.5) --getAdjustFactor(curr_pos.y, self._auto_pilot_altitude)
         --increase power lever
@@ -258,7 +237,7 @@ function hidroplane.autopilot(self, dtime, hull_direction, longit_speed, accel, 
             hidroplane.powerAdjust(self, dtime, factor, 1, max_autopilot_power)
         end
         --do not exceed
-        local max_speed = 6
+        local max_speed = hidroplane.max_speed
         if longit_speed > max_speed then
             engineacc = engineacc - (longit_speed-max_speed)
             if engineacc < 0 then engineacc = 0 end

@@ -424,6 +424,34 @@ function hidroplane.transfer_control(self, status)
     end
 end
 
+function hidroplane.engineSoundPlay(self)
+    --sound
+    if self.sound_handle then minetest.sound_stop(self.sound_handle) end
+    self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
+        {object = self.object, gain = 2.0,
+            pitch = 0.5 + ((self._power_lever/100)/2),
+            max_hear_distance = 6,
+            loop = true,})
+end
+
+function hidroplane.engine_set_sound_and_animation(self)
+    --minetest.chat_send_all('test1 ' .. dump(self._engine_running) )
+    if self._engine_running then
+        if self._last_applied_power ~= self._power_lever then
+            --minetest.chat_send_all('test2')
+            self._last_applied_power = self._power_lever
+            self.engine:set_animation_frame_speed(60 + self._power_lever)
+            hidroplane.engineSoundPlay(self)
+        end
+    else
+        if self.sound_handle then
+            minetest.sound_stop(self.sound_handle)
+            self.sound_handle = nil
+            self.engine:set_animation_frame_speed(0)
+        end
+    end
+end
+
 function hidroplane.flightstep(self)
     local velocity = self.object:get_velocity()
     local curr_pos = self.object:get_pos()
@@ -651,6 +679,12 @@ function hidroplane.flightstep(self)
     end
     ------------------------------------------------------
     -- end accell
+    ------------------------------------------------------
+
+    ------------------------------------------------------
+    -- sound and animation
+    ------------------------------------------------------
+    hidroplane.engine_set_sound_and_animation(self)
     ------------------------------------------------------
 
     --self.object:get_luaentity() --hack way to fix jitter on climb

@@ -273,6 +273,7 @@ minetest.register_entity("hidroplane:hidro", {
     _angle_of_attack = 2,
     _elevator_angle = 0,
     _power_lever = 0,
+    _last_applied_power = 0,
     _energy = 0.001,
     _last_vel = {x=0,y=0,z=0},
     _longit_speed = 0,
@@ -286,6 +287,7 @@ minetest.register_entity("hidroplane:hidro", {
 
     get_staticdata = function(self) -- unloaded/unloads ... is now saved
         return minetest.serialize({
+            --stored_sound_handle = self.sound_handle,
             stored_energy = self._energy,
             stored_owner = self.owner,
             stored_hp = self.hp_max,
@@ -293,6 +295,7 @@ minetest.register_entity("hidroplane:hidro", {
             stored_power_lever = self._power_lever,
             stored_driver_name = self.driver_name,
             stored_last_accell = self._last_accell,
+            stored_engine_running = self._engine_running,
         })
     end,
 
@@ -307,7 +310,12 @@ minetest.register_entity("hidroplane:hidro", {
             self._power_lever = data.stored_power_lever
             self.driver_name = data.stored_driver_name
             self._last_accell = data.stored_last_accell
+            self._engine_running = data.stored_engine_running
+            --self.sound_handle = data.stored_sound_handle
             --minetest.debug("loaded: ", self._energy)
+            if self._engine_running then
+                self._last_applied_power = -1 --signal to start
+            end
         end
         hidroplane.setText(self)
         self.object:set_animation({x = 1, y = 12}, 0, 0, true)

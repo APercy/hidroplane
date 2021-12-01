@@ -4,6 +4,7 @@ hidroplane.fuel = {['biofuel:biofuel'] = 1,['biofuel:bottle_fuel'] = 1,
 hidroplane.gravity = tonumber(minetest.settings:get("movement_gravity")) or 9.8
 hidroplane.wing_angle_of_attack = 3
 hidroplane.min_speed = 6
+hidroplane.max_speed = 6
 hidroplane.max_engine_acc = 7 --4.5
 hidroplane.lift = 10 --12
 

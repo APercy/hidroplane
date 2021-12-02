@@ -434,7 +434,7 @@ minetest.register_entity("hidroplane:hidro", {
 		end
 
         local is_admin = false
-        is_admin = minetest.check_player_privs(puncher, {server=true})
+        is_admin = minetest.check_player_privs(puncher, {protection_bypass=true})
 		local name = puncher:get_player_name()
         if self.owner and self.owner ~= name and self.owner ~= "" then
             if is_admin == false then return end
@@ -536,93 +536,93 @@ minetest.register_entity("hidroplane:hidro", {
             self.owner = name
         end
 
-        --check if is the owner
-        if self.owner == name then
-            -- pilot section
-            local can_access = true
-            if hidroplane.restricted == "true" then
-                can_access = minetest.check_player_privs(clicker, {flight_licence=true})
-            end
-            if can_access then
-	            if name == self.driver_name then
-                    --=========================
-                    --  dettach player
-                    --=========================
-                    -- eject passenger if the plane is on ground
-                    local touching_ground, liquid_below = hidroplane.check_node_below(self.object)
-                    if self.isinliquid or touching_ground or liquid_below then --isn't flying?
-                        --ok, remove pax
-                        if self._passenger then
-                            local passenger = minetest.get_player_by_name(self._passenger)
-                            if passenger then hidroplane.dettach_pax(self, passenger) end
-                        end
-                    else
-                        --give the control to the pax
-                        if self._passenger then
-                            self._autopilot = false
-                            hidroplane.transfer_control(self, true)
-                        end
-                    end
-                    self._instruction_mode = false
-                    hidroplane.dettachPlayer(self, clicker)
-                    --[[ sound and animation
-                    if self.sound_handle then
-                        minetest.sound_stop(self.sound_handle)
-                        self.sound_handle = nil
-                    end
-                    self.engine:set_animation_frame_speed(0)]]--
-	            elseif not self.driver_name then
-                    --=========================
-                    --  attach player
-                    --=========================
-                    --attach player
-                    local is_under_water = hidroplane.check_is_under_water(self.object)
-                    if is_under_water then return end
-
-                    --remove pax to prevent bug
-                    if self._passenger then
-                        local passenger = minetest.get_player_by_name(self._passenger)
-                        if passenger then hidroplane.dettach_pax(self, passenger) end
-                    end
-
-		            if clicker:get_player_control().sneak == true then
-                        -- flight instructor mode
-                        self._instruction_mode = true
-                        hidroplane.attach(self, clicker, true)
-                    else
-                        -- no driver => clicker is new driver
-                        self._instruction_mode = false
-                        hidroplane.attach(self, clicker)
-                    end
-                    self._command_is_given = false
-	            end
-            else
-                minetest.show_formspec(name, "hidroplane:flightlicence",
-                    "size[4,2]" ..
-                    "label[0.0,0.0;Sorry ...]"..
-                    "label[0.0,0.7;You need a flight licence to fly it.]" ..
-                    "label[0.0,1.0;You must obtain it from server admin.]" ..
-                    "button_exit[1.5,1.9;0.9,0.1;e;Exit]")
-            end
-            -- end pilot section
-        else
-            --passenger section
-            --only can enter when the pilot is inside
-            local message = core.colorize('#ff0000', " >>> You aren't the owner of this airplane.")
-            if self.driver_name ~= nil then
-                local player = minetest.get_player_by_name(self.driver_name)
-                if player then
-                    if self._passenger == nil then
-                        hidroplane.attach_pax(self, clicker)
-                    else
-                        hidroplane.dettach_pax(self, clicker)
-                    end
-                else
-                    minetest.chat_send_player(clicker:get_player_name(), message)
-                end
-            else
-                minetest.chat_send_player(clicker:get_player_name(), message)
-            end
+        local passenger_name = nil
+        if self._passenger then
+            passenger_name = minetest.get_player_by_name(self._passenger)
         end
+
+        local touching_ground, liquid_below = hidroplane.check_node_below(self.object)
+        local is_on_ground = self.isinliquid or touching_ground or liquid_below
+        local is_under_water = hidroplane.check_is_under_water(self.object)
+
+        --=========================
+        --  detach pilot
+        --=========================
+        if name == self.driver_name then
+            if is_on_ground or clicker:get_player_control().sneak then
+                if passenger_name then hidroplane.dettach_pax(self, passenger_name) end
+                self._instruction_mode = false
+                hidroplane.dettachPlayer(self, clicker)
+                --[[ sound and animation
+                if self.sound_handle then
+                    minetest.sound_stop(self.sound_handle)
+                    self.sound_handle = nil
+                end
+                self.engine:set_animation_frame_speed(0)]]--
+            else
+                -- not on ground
+                if self._passenger then
+                    --give the control to the pax
+                    self._autopilot = false
+                    hidroplane.transfer_control(self, true)
+                else
+                    minetest.chat_send_player(name, "Hold sneak and right-click to disembark while flying")
+                end
+            end
+
+        --=========================
+        --  detach passenger
+        --=========================
+        elseif name == passenger_name then
+            if is_on_ground or clicker:get_player_control().sneak then
+                hidroplane.dettach_pax(self, clicker)
+            else
+                minetest.chat_send_player(name, "Hold sneak and right-click to disembark while flying")
+            end
+
+        --=========================
+        --  attach pilot
+        --=========================
+        elseif not self.driver_name then
+            if self.owner == name or minetest.check_player_privs(clicker, {protection_bypass=true}) then
+                if hidroplane.restricted == "true" and not minetest.check_player_privs(clicker, {flight_licence=true}) then
+                    minetest.show_formspec(name, "hidroplane:flightlicence",
+                        "size[4,2]" ..
+                        "label[0.0,0.0;Sorry ...]"..
+                        "label[0.0,0.7;You need a flight licence to fly it.]" ..
+                        "label[0.0,1.0;You must obtain it from server admin.]" ..
+                        "button_exit[1.5,1.9;0.9,0.1;e;Exit]")
+                    return
+                end
+
+                if is_under_water then return end
+                --remove pax to prevent bug
+                if passenger_name then hidroplane.dettach_pax(self, passenger_name) end
+
+                --attach player
+                if clicker:get_player_control().sneak == true then
+                    -- flight instructor mode
+                    self._instruction_mode = true
+                    hidroplane.attach(self, clicker, true)
+                else
+                    -- no driver => clicker is new driver
+                    self._instruction_mode = false
+                    hidroplane.attach(self, clicker)
+                end
+                self._command_is_given = false
+            else
+                minetest.chat_send_player(name, core.colorize('#ff0000', " >>> You aren't the owner of this airplane."))
+            end
+
+        --=========================
+        --  attach passenger
+        --=========================
+        elseif self.driver_name and not passenger_name then
+            hidroplane.attach_pax(self, clicker)
+        
+        else
+            minetest.chat_send_player(name, core.colorize('#ff0000', " >>> Can't enter airplane."))
+        end
+
 	end,
 })

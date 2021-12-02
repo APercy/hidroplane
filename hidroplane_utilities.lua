@@ -427,11 +427,13 @@ end
 function hidroplane.engineSoundPlay(self)
     --sound
     if self.sound_handle then minetest.sound_stop(self.sound_handle) end
-    self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
-        {object = self.object, gain = 2.0,
-            pitch = 0.5 + ((self._power_lever/100)/2),
-            max_hear_distance = 6,
-            loop = true,})
+    if self.object then
+        self.sound_handle = minetest.sound_play({name = "hidroplane_engine"},
+            {object = self.object, gain = 2.0,
+                pitch = 0.5 + ((self._power_lever/100)/2),
+                max_hear_distance = 15,
+                loop = true,})
+    end
 end
 
 function hidroplane.engine_set_sound_and_animation(self)

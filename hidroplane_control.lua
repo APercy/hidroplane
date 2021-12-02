@@ -151,7 +151,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 end
 
 function hidroplane.set_pitch(self, dir, dtime)
-    local pitch_factor = 6
+    local pitch_factor = 8
 	if dir == -1 then
 		self._elevator_angle = math.max(self._elevator_angle-pitch_factor*dtime,-hidroplane.elevator_limit)
 	elseif dir == 1 then

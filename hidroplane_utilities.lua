@@ -458,7 +458,10 @@ function hidroplane.flightstep(self)
     local velocity = self.object:get_velocity()
     local curr_pos = self.object:get_pos()
 
-    hidroplane.last_time_command = hidroplane.last_time_command + self.dtime
+    self._last_time_command = self._last_time_command + self.dtime
+
+    if self._last_time_command > 1 then self._last_time_command = 1 end
+
     local player = nil
     if self.driver_name then player = minetest.get_player_by_name(self.driver_name) end
     local passenger = nil
@@ -469,16 +472,16 @@ function hidroplane.flightstep(self)
         ---------------------
         -- change the driver
         ---------------------
-        if passenger and hidroplane.last_time_command >= 1 and self._instruction_mode == true then
+        if passenger and self._last_time_command >= 1 and self._instruction_mode == true then
             if self._command_is_given == true then
                 if ctrl.sneak or ctrl.jump or ctrl.up or ctrl.down or ctrl.right or ctrl.left then
-                    hidroplane.last_time_command = 0
+                    self._last_time_command = 0
                     --take the control
                     hidroplane.transfer_control(self, false)
                 end
             else
                 if ctrl.sneak == true and ctrl.jump == true then
-                    hidroplane.last_time_command = 0
+                    self._last_time_command = 0
                     --trasnfer the control to student
                     hidroplane.transfer_control(self, true)
                 end
@@ -487,16 +490,16 @@ function hidroplane.flightstep(self)
         -----------
         --autopilot
         -----------
-        if self._instruction_mode == false and hidroplane.last_time_command >= 1 then
+        if self._instruction_mode == false and self._last_time_command >= 1 then
             if self._autopilot == true then
                 if ctrl.sneak or ctrl.jump or ctrl.up or ctrl.down or ctrl.right or ctrl.left then
-                    hidroplane.last_time_command = 0
+                    self._last_time_command = 0
                     self._autopilot = false
                     minetest.chat_send_player(self.driver_name," >>> Autopilot deactivated")
                 end
             else
                 if ctrl.sneak == true and ctrl.jump == true then
-                    hidroplane.last_time_command = 0
+                    self._last_time_command = 0
                     self._autopilot = true
                     self._auto_pilot_altitude = curr_pos.y
                     minetest.chat_send_player(self.driver_name,core.colorize('#00ff00', " >>> Autopilot on"))
@@ -506,8 +509,8 @@ function hidroplane.flightstep(self)
         ----------------------------------
         -- shows the hud for the player
         ----------------------------------
-        if ctrl.up == true and ctrl.down == true and hidroplane.last_time_command >= 1 then
-            hidroplane.last_time_command = 0
+        if ctrl.up == true and ctrl.down == true and self._last_time_command >= 1 then
+            self._last_time_command = 0
             if self._show_hud == true then
                 self._show_hud = false
             else
@@ -699,7 +702,7 @@ function hidroplane.flightstep(self)
     end
 
     --is an stall, force a recover
-    if self._angle_of_attack > 5 and climb_rate < -3 then
+    if self._angle_of_attack > 3 and climb_rate < -2 then
         self._elevator_angle = 0
         self._angle_of_attack = -1
         newpitch = math.rad(self._angle_of_attack)

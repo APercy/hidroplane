@@ -284,6 +284,7 @@ minetest.register_entity("hidroplane:hidro", {
     _autopilot = false,
     _auto_pilot_altitude = 0,
     _last_accell = {x=0,y=0,z=0},
+    _last_time_command = 1,
 
     get_staticdata = function(self) -- unloaded/unloads ... is now saved
         return minetest.serialize({

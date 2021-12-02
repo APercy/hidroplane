@@ -44,7 +44,6 @@ end
 
 function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_drag,
                             later_speed, later_drag, accel, player, is_flying)
-    if hidroplane.last_time_command > 1 then hidroplane.last_time_command = 1 end
     --if self.driver_name == nil then return end
     local retval_accel = accel
 
@@ -56,8 +55,8 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 		ctrl = player:get_player_control()
 
         --engine and power control
-        if ctrl.aux1 and hidroplane.last_time_command > 0.5 then
-            hidroplane.last_time_command = 0
+        if ctrl.aux1 and self._last_time_command > 0.5 then
+            self._last_time_command = 0
 		    if self._engine_running then
 			    self._engine_running = false
                 self._autopilot = false
@@ -152,7 +151,7 @@ function hidroplane.control(self, dtime, hull_direction, longit_speed, longit_dr
 end
 
 function hidroplane.set_pitch(self, dir, dtime)
-    local pitch_factor = 10
+    local pitch_factor = 6
 	if dir == -1 then
 		self._elevator_angle = math.max(self._elevator_angle-pitch_factor*dtime,-hidroplane.elevator_limit)
 	elseif dir == 1 then

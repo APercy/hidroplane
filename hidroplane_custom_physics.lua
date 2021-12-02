@@ -75,6 +75,7 @@ function hidroplane.physics(self)
 	end
 
     new_velocity = vector.add(new_velocity, vector.multiply(self._last_accell, self.dtime))
+    self.object:set_pos(self.object:get_pos())
 		-- dumb friction
 	if self.isonground and not self.isinliquid then
 		self.object:set_velocity({x=new_velocity.x*friction,

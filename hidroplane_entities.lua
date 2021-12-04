@@ -545,7 +545,7 @@ minetest.register_entity("hidroplane:hidro", {
         local is_on_ground = self.isinliquid or touching_ground or liquid_below
         local is_under_water = hidroplane.check_is_under_water(self.object)
 
-        minetest.chat_send_all('name '.. dump(name) .. ' - pilot: ' .. dump(self.driver_name) .. ' - pax: ' .. dump(passenger_name))
+        --minetest.chat_send_all('name '.. dump(name) .. ' - pilot: ' .. dump(self.driver_name) .. ' - pax: ' .. dump(passenger_name))
         --=========================
         --  detach pilot
         --=========================

@@ -538,19 +538,28 @@ minetest.register_entity("hidroplane:hidro", {
 
         local passenger_name = nil
         if self._passenger then
-            passenger_name = minetest.get_player_by_name(self._passenger)
+            passenger_name = self._passenger
         end
 
         local touching_ground, liquid_below = hidroplane.check_node_below(self.object)
         local is_on_ground = self.isinliquid or touching_ground or liquid_below
         local is_under_water = hidroplane.check_is_under_water(self.object)
 
+        minetest.chat_send_all('name '.. dump(name) .. ' - pilot: ' .. dump(self.driver_name) .. ' - pax: ' .. dump(passenger_name))
         --=========================
         --  detach pilot
         --=========================
         if name == self.driver_name then
             if is_on_ground or clicker:get_player_control().sneak then
-                if passenger_name then hidroplane.dettach_pax(self, passenger_name) end
+                if passenger_name then --any pax?
+                    if is_on_ground then --okay, goodbye
+                        local pax_obj = minetest.get_player_by_name(passenger_name)
+                        hidroplane.dettach_pax(self, pax_obj)
+                    else -- oh no!!!! you are the pilot now! Good luck
+                        hidroplane.transfer_control(self, true)
+                        self._command_is_given = true
+                    end
+                end
                 self._instruction_mode = false
                 hidroplane.dettachPlayer(self, clicker)
                 --[[ sound and animation
@@ -565,9 +574,10 @@ minetest.register_entity("hidroplane:hidro", {
                     --give the control to the pax
                     self._autopilot = false
                     hidroplane.transfer_control(self, true)
-                else
-                    minetest.chat_send_player(name, "Hold sneak and right-click to disembark while flying")
+                    self._command_is_given = true
+                    self._instruction_mode = true
                 end
+                minetest.chat_send_player(name, "Hold sneak and right-click to disembark while flying")
             end
 
         --=========================
@@ -597,7 +607,10 @@ minetest.register_entity("hidroplane:hidro", {
 
                 if is_under_water then return end
                 --remove pax to prevent bug
-                if passenger_name then hidroplane.dettach_pax(self, passenger_name) end
+                if self._passenger then 
+                    local pax_obj = minetest.get_player_by_name(self._passenger)
+                    hidroplane.dettach_pax(self, pax_obj)
+                end
 
                 --attach player
                 if clicker:get_player_control().sneak == true then
@@ -617,7 +630,7 @@ minetest.register_entity("hidroplane:hidro", {
         --=========================
         --  attach passenger
         --=========================
-        elseif self.driver_name and not passenger_name then
+        elseif self.driver_name and not self._passenger then
             hidroplane.attach_pax(self, clicker)
         
         else

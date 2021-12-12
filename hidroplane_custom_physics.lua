@@ -81,7 +81,7 @@ function hidroplane.physics(self)
     under some circunstances the velocity exceeds the max value accepted by set_velocity and
     the game crashes with an overflow, so limiting the max velocity in each axis prevents the crash
     ]]--
-    local max_factor = 25
+    local max_factor = 55
     local vel_adjusted = 40
     if new_velocity.x > max_factor then new_velocity.x = vel_adjusted end
     if new_velocity.x < -max_factor then new_velocity.x = -vel_adjusted end

@@ -77,6 +77,25 @@ function hidroplane.get_gauge_angle(value, initial_angle)
 	return angle
 end
 
+--returns 0 for old, 1 for new
+function hidroplane.detect_player_api(player)
+    local player_proterties = player:get_properties()
+    local mesh = "character.b3d"
+    if player_proterties.mesh == mesh then
+        local models = player_api.registered_models
+        local character = models[mesh]
+        if character then
+            if character.animations.sit.eye_height then
+                return 1
+            else
+                return 0
+            end
+        end
+    end
+
+    return 0
+end
+
 -- attach player
 function hidroplane.attach(self, player, instructor_mode)
     instructor_mode = instructor_mode or false
@@ -84,14 +103,25 @@ function hidroplane.attach(self, player, instructor_mode)
     self.driver_name = name
 
     -- attach the driver
+    local eye_y = 0
+    if instructor_mode == true then
+        eye_y = -2.5
+        player:set_attach(self.passenger_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
+    else
+        eye_y = -4
+        player:set_attach(self.pilot_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
+    end
+    if hidroplane.detect_player_api(player) == 1 then
+        eye_y = eye_y + 6.5
+    end
+
+    -- attach the driver
     if instructor_mode == true then
         player:set_attach(self.passenger_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
-        player:set_eye_offset({x = 0, y = -2.5, z = 2}, {x = 0, y = 1, z = -30})
     else
         player:set_attach(self.pilot_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
-        player:set_eye_offset({x = 0, y = -4, z = 2}, {x = 0, y = 1, z = -30})
     end
-    player:set_eye_offset({x = 0, y = -4, z = 2}, {x = 0, y = 1, z = -30})
+    player:set_eye_offset({x = 0, y = eye_y, z = 2}, {x = 0, y = 1, z = -30})
     player_api.player_attached[name] = true
     -- make the driver sit
     minetest.after(0.2, function()
@@ -109,13 +139,18 @@ function hidroplane.attach_pax(self, player)
     self._passenger = name
 
     -- attach the driver
+    local eye_y = 0
     if self._instruction_mode == true then
+        eye_y = -4
         player:set_attach(self.pilot_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
-        player:set_eye_offset({x = 0, y = -4, z = 2}, {x = 0, y = 3, z = -30})
     else
+        eye_y = -2.5
         player:set_attach(self.passenger_seat_base, "", {x = 0, y = 0, z = 0}, {x = 0, y = 0, z = 0})
-        player:set_eye_offset({x = 0, y = -2.5, z = 2}, {x = 0, y = 3, z = -30})
     end
+    if hidroplane.detect_player_api(player) == 1 then
+        eye_y = eye_y + 6.5
+    end
+    player:set_eye_offset({x = 0, y = eye_y, z = 2}, {x = 0, y = 1, z = -30})
     player_api.player_attached[name] = true
     -- make the driver sit
     minetest.after(0.2, function()

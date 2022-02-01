@@ -462,7 +462,7 @@ minetest.register_entity("hidroplane:hidro", {
             end
 
             --repair
-            if (item_name == "hidroplane:repair_tool" or item_name == "trike:repair_tool")
+            if (item_name == "airutils:repair_tool")
                     and self._engine_running == false  then
                 if self.hp_max < 50 then
                     local inventory_item = "default:steel_ingot"

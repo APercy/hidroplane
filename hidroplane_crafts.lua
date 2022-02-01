@@ -88,12 +88,4 @@ if minetest.get_modpath("default") then
             {"hidroplane:floaters",},
 		}
 	})
-    minetest.register_craft({
-	    output = "hidroplane:repair_tool",
-	    recipe = {
-		    {"default:steel_ingot", "default:tin_ingot", "default:steel_ingot"},
-		    {"", "default:steel_ingot", ""},
-		    {"", "default:steel_ingot", ""},
-	    },
-    })
 end

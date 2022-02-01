@@ -44,12 +44,12 @@ minetest.register_craftitem("hidroplane:hidro", {
 })
 
 -- repair tool
-if not minetest.registered_items["trike:repair_tool"] then
+--[[if not minetest.registered_items["trike:repair_tool"] then
     minetest.register_craftitem("hidroplane:repair_tool",{
 	    description = "Hidroplane repair tool",
 	    inventory_image = "repair_tool.png",
     })
-end
+end]]--
 
 --
 -- crafting

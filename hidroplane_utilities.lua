@@ -189,11 +189,6 @@ function hidroplane.destroy(self)
     if self.wheels then self.wheels:remove() end
     if self.f_wheels then self.f_wheels:remove() end
 
-    if self.elevator then self.elevator:remove() end
-    if self.rudder then self.rudder:remove() end
-    if self.right_aileron then self.right_aileron:remove() end
-    if self.left_aileron then self.left_aileron:remove() end
-
     if self.stick then self.stick:remove() end
 
     self.object:remove()
@@ -224,6 +219,7 @@ end
 function hidroplane.testImpact(self, velocity, position)
     local p = position --self.object:get_pos()
     local collision = false
+    
     if self._last_vel == nil then return end
     --lets calculate the vertical speed, to avoid the bug on colliding on floor with hard lag
     if abs(velocity.y - self._last_vel.y) > 2 then
@@ -254,6 +250,42 @@ function hidroplane.testImpact(self, velocity, position)
 			collision = true
 		end
     end
+
+    if impact > 1.0  and self._longit_speed > 2 then
+        local noded = mobkit.nodeatpos(mobkit.pos_shift(p,{y=-2.8}))
+	    if (noded and noded.drawtype ~= 'airlike') then
+            if noded.drawtype ~= 'liquid' then
+                minetest.sound_play("hidroplane_touch", {
+                    --to_player = self.driver_name,
+                    object = self.object,
+                    max_hear_distance = 15,
+                    gain = 1.0,
+                    fade = 0.0,
+                    pitch = 1.0,
+                }, true)
+            end
+	    end
+    end
+
+    if self._last_water_touch == nil then self._last_water_touch = 3 end
+    if self._last_water_touch <= 3 then self._last_water_touch = self._last_water_touch + self.dtime end
+    if impact > 0.2  and self._longit_speed > 1 and self._last_water_touch >=3 then
+        self._last_water_touch = 0
+        local noded = mobkit.nodeatpos(mobkit.pos_shift(p,{y=-2.8}))
+	    if (noded and noded.drawtype ~= 'airlike') then
+            if noded.drawtype == 'liquid' then
+                minetest.sound_play("hidroplane_touch_water", {
+                    --to_player = self.driver_name,
+                    object = self.object,
+                    max_hear_distance = 15,
+                    gain = 1.0,
+                    fade = 0.0,
+                    pitch = 1.0,
+                }, true)
+            end
+	    end
+    end
+
 
     if collision then
         --self.object:set_velocity({x=0,y=0,z=0})
@@ -645,12 +677,12 @@ function hidroplane.flightstep(self)
     --end
 
     --adjust elevator pitch (3d model)
-    self.elevator:set_attach(self.object,'',{x=0,y=4,z=-35.5},{x=-self._elevator_angle*2,y=0,z=0})
+    self.object:set_bone_position("elevator", {x=0, y=4, z=-35.5}, {x=-self._elevator_angle*2 - 90, y=0, z=0})
     --adjust rudder
-    self.rudder:set_attach(self.object,'',{x=0,y=0.12,z=-36.85},{x=0,y=self._rudder_angle,z=0})
+    self.object:set_bone_position("rudder", {x=0,y=8.4,z=-36.85}, {x=0,y=self._rudder_angle,z=0})
     --adjust ailerons
-    self.right_aileron:set_attach(self.object,'',{x=0,y=8.08,z=-7},{x=-self._rudder_angle,y=0,z=0})
-    self.left_aileron:set_attach(self.object,'',{x=0,y=8.08,z=-7},{x=self._rudder_angle,y=0,z=0})
+    self.object:set_bone_position("aileron.r", {x=30.377,y=8.2,z=-7}, {x=-self._rudder_angle - 90,y=0,z=0})
+    self.object:set_bone_position("aileron.l", {x=-30.377,y=8.2,z=-7}, {x=self._rudder_angle - 90,y=0,z=0})
     --set stick position
     self.stick:set_attach(self.object,'',{x=0,y=-6,85,z=8},{x=self._elevator_angle/2,y=0,z=self._rudder_angle})
 

@@ -247,12 +247,29 @@ minetest.register_entity("hidroplane:hidro", {
 	    visual = "mesh",
 	    mesh = "hidroplane_fuselage.b3d",
         stepheight = 0.5,
-        textures = {"hidroplane_black.png", "hidroplane_black.png", "hidroplane_metal.png", "hidroplane_painting.png",
-                "hidroplane_grey.png", "hidroplane_painting.png", "hidroplane_painting.png", "hidroplane_panel.png",
-                "hidroplane_painting.png", "hidroplane_glass.png", "hidroplane_glass.png", "hidroplane_black.png",
-                "hidroplane_grey.png", "hidroplane_black.png", "hidroplane_black2.png",
-                "hidroplane_black.png", "hidroplane_glass.png", "hidroplane_black.png",
-                "hidroplane_painting.png"},
+        textures = {
+                    "hidroplane_painting.png", --superficies controle
+                    "hidroplane_black.png", --banco1
+                    "hidroplane_black.png", --banco2
+                    "hidroplane_metal.png", --motor
+                    "hidroplane_painting.png", --est horizontal
+                    "hidroplane_metal.png", --longarinas
+                    "hidroplane_painting.png", --montantes
+                    "hidroplane_painting.png", --flutuadores
+                    "hidroplane_panel.png", --painel
+                    "hidroplane_painting.png", --lado esquerdo
+                    "hidroplane_painting.png", --lado direito
+                    "hidroplane_glass.png", --parabrisa
+                    "hidroplane_glass.png", --janelas laterais
+                    "hidroplane_black.png", --entradas motor
+                    "hidroplane_grey.png", --interior
+                    "hidroplane_black.png", --cobertura painel
+                    "hidroplane_black.png", --fundo painel
+                    "hidroplane_black.png", --cabeçote
+                    "hidroplane_glass.png", --teto
+                    "hidroplane_black.png", --fendas flutuadores
+                    "hidroplane_painting.png", --asas
+                    },
     },
     textures = {},
 	driver_name = nil,
@@ -330,22 +347,6 @@ minetest.register_entity("hidroplane:hidro", {
         engine:set_animation({x = 1, y = 12}, 0, 0, true)
 	    self.engine = engine
 
-	    local rudder=minetest.add_entity(pos,'hidroplane:rudder')
-	    rudder:set_attach(self.object,'',{x=0,y=0.12,z=-36.85},{x=0,y=0,z=0})
-	    self.rudder = rudder
-
-	    local right_aileron=minetest.add_entity(pos,'hidroplane:right_aileron')
-	    right_aileron:set_attach(self.object,'',{x=0,y=8.08,z=-7},{x=0,y=0,z=0})
-	    self.right_aileron = right_aileron
-
-	    local left_aileron=minetest.add_entity(pos,'hidroplane:left_aileron')
-	    left_aileron:set_attach(self.object,'',{x=0,y=8.08,z=-7},{x=0,y=0,z=0})
-	    self.left_aileron = left_aileron
-
-	    local elevator=minetest.add_entity(pos,'hidroplane:elevator')
-	    elevator:set_attach(self.object,'',{x=0,y=4,z=-35.5},{x=0,y=0,z=0})
-	    self.elevator = elevator
-
 	    local wheels=minetest.add_entity(pos,'hidroplane:wheels')
 	    wheels:set_attach(self.object,'',{x=0,y=0,z=0},{x=0,y=0,z=0})
 		-- set the animation once and later only change the speed
@@ -390,11 +391,7 @@ minetest.register_entity("hidroplane:hidro", {
 	    stick:set_attach(self.object,'',{x=0,y=-6.85,z=8},{x=0,y=0,z=0})
 	    self.stick = stick
 
-        hidroplane.paint(self, self.object, self._color, "hidroplane_painting.png")
-        hidroplane.paint(self, self.elevator, self._color, "hidroplane_painting.png")
-        hidroplane.paint(self, self.rudder, self._color, "hidroplane_painting.png")
-        hidroplane.paint(self, self.right_aileron, self._color, "hidroplane_painting.png")
-        hidroplane.paint(self, self.left_aileron, self._color, "hidroplane_painting.png")
+        airutils.paint(self, self._color, "hidroplane_painting.png")
 
 		self.object:set_armor_groups({immortal=1})
 	end,
@@ -482,25 +479,7 @@ minetest.register_entity("hidroplane:hidro", {
 
             -- deal with painting or destroying
 		    if itmstck then
-			    local _,indx = item_name:find('dye:')
-			    if indx then
-
-                    --lets paint!!!!
-				    local color = item_name:sub(indx+1)
-				    local colstr = hidroplane.colors[color]
-                    --minetest.chat_send_all(color ..' '.. dump(colstr))
-				    if colstr then
-                        hidroplane.paint(self, self.object, colstr, "hidroplane_painting.png")
-                        hidroplane.paint(self, self.elevator, colstr, "hidroplane_painting.png")
-                        hidroplane.paint(self, self.rudder, colstr, "hidroplane_painting.png")
-                        hidroplane.paint(self, self.right_aileron, colstr, "hidroplane_painting.png")
-                        hidroplane.paint(self, self.left_aileron, colstr, "hidroplane_painting.png")
-					    itmstck:set_count(itmstck:get_count()-1)
-					    puncher:set_wielded_item(itmstck)
-				    end
-                    -- end painting
-
-			    else -- deal damage
+			    if airutils.set_paint(self, puncher, itmstck, "hidroplane_painting.png") == false then
 				    if not self.driver and toolcaps and toolcaps.damage_groups
                             and toolcaps.damage_groups.fleshy and item_name ~= hidroplane.fuel then
 					    --mobkit.hurt(self,toolcaps.damage_groups.fleshy - 1)

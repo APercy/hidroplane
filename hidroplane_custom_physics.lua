@@ -91,7 +91,7 @@ function hidroplane.physics(self)
     if new_velocity.y < -max_factor then new_velocity.y = -vel_adjusted end
     -- end correction
 
-    self.object:move_to(self.object:get_pos())
+    self.object:set_pos(self.object:get_pos())
 		-- dumb friction
 	if self.isonground and not self.isinliquid then
 		self.object:set_velocity({x=new_velocity.x*friction,

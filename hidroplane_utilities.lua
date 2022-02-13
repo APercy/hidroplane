@@ -139,22 +139,6 @@ function hidroplane.checkAttach(self, player)
     return false
 end
 
---painting
-function hidroplane.paint(self, object, colstr, search_string)
-    if colstr then
-        self._color = colstr
-        local entity = object:get_luaentity()
-        local l_textures = entity.initial_properties.textures
-        for _, texture in ipairs(l_textures) do
-            local indx = texture:find(search_string)
-            if indx then
-                l_textures[_] = search_string .."^[multiply:".. colstr
-            end
-        end
-        object:set_properties({textures=l_textures})
-    end
-end
-
 -- destroy the boat
 function hidroplane.destroy(self)
     if self.sound_handle then

@@ -213,6 +213,8 @@ minetest.register_entity("hidroplane:hidro", {
     _last_accell = {x=0,y=0,z=0},
     _last_time_command = 1,
     _wing_configuration = hidroplane.wing_angle_of_attack,
+    _inv = nil,
+    _inv_id = "",
 
     get_staticdata = function(self) -- unloaded/unloads ... is now saved
         return minetest.serialize({
@@ -225,8 +227,13 @@ minetest.register_entity("hidroplane:hidro", {
             stored_driver_name = self.driver_name,
             stored_last_accell = self._last_accell,
             stored_engine_running = self._engine_running,
+            stored_inv_id = self._inv_id,
         })
     end,
+
+	on_deactivate = function(self)
+        airutils.save_inventory(self)
+	end,
 
 	on_activate = function(self, staticdata, dtime_s)
         mobkit.actfunc(self, staticdata, dtime_s)
@@ -240,6 +247,7 @@ minetest.register_entity("hidroplane:hidro", {
             self.driver_name = data.stored_driver_name
             self._last_accell = data.stored_last_accell
             self._engine_running = data.stored_engine_running
+            self._inv_id = data.stored_inv_id
             --self.sound_handle = data.stored_sound_handle
             --minetest.debug("loaded: ", self._energy)
             if self._engine_running then
@@ -304,6 +312,14 @@ minetest.register_entity("hidroplane:hidro", {
         airutils.paint(self, self._color, "hidroplane_painting.png")
 
 		self.object:set_armor_groups({immortal=1})
+
+		local inv = minetest.get_inventory({type = "detached", name = self._inv_id})
+		-- if the game was closed the inventories have to be made anew, instead of just reattached
+		if not inv then
+            airutils.create_inventory(self, hidroplane.trunk_slots)
+		else
+		    self.inv = inv
+        end
 	end,
 
     --on_step = mobkit.stepfunc,
@@ -391,11 +407,11 @@ minetest.register_entity("hidroplane:hidro", {
 		    if itmstck then
 			    if airutils.set_paint(self, puncher, itmstck, "hidroplane_painting.png") == false then
 				    if not self.driver and toolcaps and toolcaps.damage_groups
-                            and toolcaps.damage_groups.fleshy and item_name ~= hidroplane.fuel then
+                            and toolcaps.damage_groups.fleshy and item_name ~= airutils.fuel then
 					    --mobkit.hurt(self,toolcaps.damage_groups.fleshy - 1)
 					    --mobkit.make_sound(self,'hit')
                         self.hp_max = self.hp_max - 10
-                        minetest.sound_play("collision", {
+                        minetest.sound_play("hidroplane_collision", {
 	                        object = self.object,
 	                        max_hear_distance = 5,
 	                        gain = 1.0,
@@ -485,34 +501,38 @@ minetest.register_entity("hidroplane:hidro", {
         --=========================
         elseif not self.driver_name then
             if self.owner == name or minetest.check_player_privs(clicker, {protection_bypass=true}) then
-                if hidroplane.restricted == "true" and not minetest.check_player_privs(clicker, {flight_licence=true}) then
-                    minetest.show_formspec(name, "hidroplane:flightlicence",
-                        "size[4,2]" ..
-                        "label[0.0,0.0;Sorry ...]"..
-                        "label[0.0,0.7;You need a flight licence to fly it.]" ..
-                        "label[0.0,1.0;You must obtain it from server admin.]" ..
-                        "button_exit[1.5,1.9;0.9,0.1;e;Exit]")
-                    return
-                end
-
-                if is_under_water then return end
-                --remove pax to prevent bug
-                if self._passenger then 
-                    local pax_obj = minetest.get_player_by_name(self._passenger)
-                    hidroplane.dettach_pax(self, pax_obj)
-                end
-
-                --attach player
-                if clicker:get_player_control().sneak == true then
-                    -- flight instructor mode
-                    self._instruction_mode = true
-                    hidroplane.attach(self, clicker, true)
+                if clicker:get_player_control().aux1 == true then --lets see the inventory
+                    airutils.show_vehicle_trunk_formspec(self, clicker, hidroplane.trunk_slots)
                 else
-                    -- no driver => clicker is new driver
-                    self._instruction_mode = false
-                    hidroplane.attach(self, clicker)
+                    if hidroplane.restricted == "true" and not minetest.check_player_privs(clicker, {flight_licence=true}) then
+                        minetest.show_formspec(name, "hidroplane:flightlicence",
+                            "size[4,2]" ..
+                            "label[0.0,0.0;Sorry ...]"..
+                            "label[0.0,0.7;You need a flight licence to fly it.]" ..
+                            "label[0.0,1.0;You must obtain it from server admin.]" ..
+                            "button_exit[1.5,1.9;0.9,0.1;e;Exit]")
+                        return
+                    end
+
+                    if is_under_water then return end
+                    --remove pax to prevent bug
+                    if self._passenger then 
+                        local pax_obj = minetest.get_player_by_name(self._passenger)
+                        hidroplane.dettach_pax(self, pax_obj)
+                    end
+
+                    --attach player
+                    if clicker:get_player_control().sneak == true then
+                        -- flight instructor mode
+                        self._instruction_mode = true
+                        hidroplane.attach(self, clicker, true)
+                    else
+                        -- no driver => clicker is new driver
+                        self._instruction_mode = false
+                        hidroplane.attach(self, clicker)
+                    end
+                    self._command_is_given = false
                 end
-                self._command_is_given = false
             else
                 minetest.chat_send_player(name, core.colorize('#ff0000', " >>> You aren't the owner of this airplane."))
             end

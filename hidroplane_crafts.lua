@@ -37,6 +37,7 @@ minetest.register_craftitem("hidroplane:hidro", {
             ent.owner = owner
 			hidro:set_yaw(placer:get_look_horizontal())
 			itemstack:take_item()
+            airutils.create_inventory(ent, hidroplane.trunk_slots, owner)
 		end
 
 		return itemstack

@@ -33,6 +33,7 @@ dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_custom_phy
 dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_utilities.lua")
 dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_entities.lua")
 dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_manual.lua")
+dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_forms.lua")
 
 --
 -- helpers and co.

@@ -447,7 +447,7 @@ minetest.register_entity("hidroplane:hidro", {
             passenger_name = self._passenger
         end
 
-        local touching_ground, liquid_below = airutils.check_node_below(self.object, 2.5)
+        local touching_ground, liquid_below = airutils.check_node_below(self.object, 1.3)
         local is_on_ground = self.isinliquid or touching_ground or liquid_below
         local is_under_water = airutils.check_is_under_water(self.object)
 
@@ -456,36 +456,7 @@ minetest.register_entity("hidroplane:hidro", {
         --  detach pilot
         --=========================
         if name == self.driver_name then
-            if is_on_ground or clicker:get_player_control().sneak then
-                if passenger_name then --any pax?
-                    if is_on_ground then --okay, goodbye
-                        local pax_obj = minetest.get_player_by_name(passenger_name)
-                        hidroplane.dettach_pax(self, pax_obj)
-                    else -- oh no!!!! you are the pilot now! Good luck
-                        airutils.transfer_control(self, true)
-                        self._command_is_given = true
-                    end
-                end
-                self._instruction_mode = false
-                hidroplane.dettachPlayer(self, clicker)
-                --[[ sound and animation
-                if self.sound_handle then
-                    minetest.sound_stop(self.sound_handle)
-                    self.sound_handle = nil
-                end
-                self.engine:set_animation_frame_speed(0)]]--
-            else
-                -- not on ground
-                if self._passenger then
-                    --give the control to the pax
-                    self._autopilot = false
-                    airutils.transfer_control(self, true)
-                    self._command_is_given = true
-                    self._instruction_mode = true
-                end
-                minetest.chat_send_player(name, "Hold sneak and right-click to disembark while flying")
-            end
-
+            hidroplane.pilot_formspec(name)
         --=========================
         --  detach passenger
         --=========================
@@ -531,6 +502,8 @@ minetest.register_entity("hidroplane:hidro", {
                         self._instruction_mode = false
                         hidroplane.attach(self, clicker)
                     end
+                    self._elevator_angle = 0
+                    self._rudder_angle = 0
                     self._command_is_given = false
                 end
             else

@@ -630,9 +630,9 @@ function hidroplane.flightstep(self)
     end
 
     --is an stall, force a recover
-    if self._angle_of_attack > 3 and climb_rate < -2.8 then
+    if longit_speed < (hidroplane.min_speed / 2) and climb_rate < -2.8 and is_flying then
         self._elevator_angle = 0
-        self._angle_of_attack = -1
+        self._angle_of_attack = -2
         newpitch = math.rad(self._angle_of_attack)
     end
 

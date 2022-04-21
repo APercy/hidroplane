@@ -614,6 +614,10 @@ function hidroplane.flightstep(self)
     -- end accell
     ------------------------------------------------------
 
+    if player then 
+        hidroplane.attach(self, player, self._instruction_mode)
+    end
+
     ------------------------------------------------------
     -- sound and animation
     ------------------------------------------------------

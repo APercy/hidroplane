@@ -478,6 +478,10 @@ function hidroplane.flightstep(self)
 
     local is_attached = hidroplane.checkAttach(self, player)
 
+    if longit_speed == 0 and is_flying == false and is_attached == false then
+        return
+    end
+
     --ajustar angulo de ataque
     local percentage = math.abs(((longit_speed * 100)/(hidroplane.min_speed + 5))/100)
     if percentage > 1.5 then percentage = 1.5 end

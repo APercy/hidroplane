@@ -82,7 +82,7 @@ function hidroplane.attach_pax(self, player)
     player:set_eye_offset({x = 0, y = eye_y, z = 2}, {x = 0, y = 1, z = -30})
     player_api.player_attached[name] = true
     -- make the driver sit
-    minetest.after(0.2, function()
+    minetest.after(1, function()
         player = minetest.get_player_by_name(name)
         if player then
 	        player_api.set_animation(player, "sit")

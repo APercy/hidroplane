@@ -34,17 +34,17 @@ function hidroplane.physics(self)
 	--buoyancy
 	local surface = nil
 	local surfnodename = nil
-	local spos = mobkit.get_stand_pos(self)
+	local spos = airutils.get_stand_pos(self)
 	spos.y = spos.y+0.01
 	-- get surface height
-	local snodepos = mobkit.get_node_pos(spos)
-	local surfnode = mobkit.nodeatpos(spos)
+	local snodepos = airutils.get_node_pos(spos)
+	local surfnode = airutils.nodeatpos(spos)
 	while surfnode and (surfnode.drawtype == 'liquid' or surfnode.drawtype == 'flowingliquid') do
 		surfnodename = surfnode.name
 		surface = snodepos.y +0.5
 		if surface > spos.y+self.height then break end
 		snodepos.y = snodepos.y+1
-		surfnode = mobkit.nodeatpos(snodepos)
+		surfnode = airutils.nodeatpos(snodepos)
 	end
 
     local new_velocity = nil
@@ -59,18 +59,18 @@ function hidroplane.physics(self)
         local height = self.height
 		local submergence = min(surface-spos.y,height)/height
 --		local balance = self.buoyancy*self.height
-		local buoyacc = mobkit.gravity*(self.buoyancy-submergence)
-		--[[mobkit.set_acceleration(self.object,
+		local buoyacc = airutils.gravity*(self.buoyancy-submergence)
+		--[[airutils.set_acceleration(self.object,
 			{x=-vel.x*self.water_drag,y=buoyacc-vel.y*abs(vel.y)*0.4,z=-vel.z*self.water_drag})]]--
         accell = {x=-vel.x*self.water_drag,y=buoyacc-(vel.y*abs(vel.y)*0.4),z=-vel.z*self.water_drag}
         --local v_accell = {x=0,y=buoyacc-(vel.y*abs(vel.y)*0.4),z=0}
-        --mobkit.set_acceleration(self.object,v_accell)
+        --airutils.set_acceleration(self.object,v_accell)
         new_velocity = vector.add(vel, vector.multiply(accell, self.dtime))
         
 	else
-        mobkit.set_acceleration(self.object,{x=0,y=0,z=0})
+        airutils.set_acceleration(self.object,{x=0,y=0,z=0})
 		self.isinliquid = false
-        new_velocity = vector.add(vel, {x=0,y=mobkit.gravity * self.dtime,z=0})
+        new_velocity = vector.add(vel, {x=0,y=airutils.gravity * self.dtime,z=0})
         --self.object:set_velocity(new_velocity)
 	end
 

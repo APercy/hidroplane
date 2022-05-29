@@ -208,7 +208,7 @@ function hidroplane.testImpact(self, velocity, position)
     if self._last_vel == nil then return end
     --lets calculate the vertical speed, to avoid the bug on colliding on floor with hard lag
     if abs(velocity.y - self._last_vel.y) > 2 then
-		local noded = mobkit.nodeatpos(mobkit.pos_shift(p,{y=-2.8}))
+		local noded = airutils.nodeatpos(airutils.pos_shift(p,{y=-2.8}))
 	    if (noded and noded.drawtype ~= 'airlike') then
 		    collision = true
 	    else
@@ -227,7 +227,7 @@ function hidroplane.testImpact(self, velocity, position)
     end
 
     if impact > 1.0  and self._longit_speed > 2 then
-        local noded = mobkit.nodeatpos(mobkit.pos_shift(p,{y=-2.8}))
+        local noded = airutils.nodeatpos(airutils.pos_shift(p,{y=-2.8}))
 	    if (noded and noded.drawtype ~= 'airlike') then
             if noded.drawtype ~= 'liquid' then
                 minetest.sound_play("hidroplane_touch", {
@@ -246,7 +246,7 @@ function hidroplane.testImpact(self, velocity, position)
     if self._last_water_touch <= 3 then self._last_water_touch = self._last_water_touch + self.dtime end
     if impact > 0.2  and self._longit_speed > 1 and self._last_water_touch >=3 then
         self._last_water_touch = 0
-        local noded = mobkit.nodeatpos(mobkit.pos_shift(p,{y=-2.8}))
+        local noded = airutils.nodeatpos(airutils.pos_shift(p,{y=-2.8}))
 	    if (noded and noded.drawtype ~= 'airlike') then
             if noded.drawtype == 'liquid' then
                 minetest.sound_play("hidroplane_touch_water", {
@@ -447,7 +447,7 @@ function hidroplane.flightstep(self)
     if newroll > 360 then newroll = newroll - 360 end
     if newroll < -360 then newroll = newroll + 360 end
 
-    local hull_direction = mobkit.rot_to_dir(rotation) --minetest.yaw_to_dir(yaw)
+    local hull_direction = airutils.rot_to_dir(rotation) --minetest.yaw_to_dir(yaw)
     local nhdir = {x=hull_direction.z,y=0,z=-hull_direction.x}		-- lateral unit vector
 
     local longit_speed = vector.dot(velocity,hull_direction)
@@ -461,7 +461,7 @@ function hidroplane.flightstep(self)
     local accel = vector.add(longit_drag,later_drag)
     local stop = false
 
-    local node_bellow = mobkit.nodeatpos(mobkit.pos_shift(curr_pos,{y=-3}))
+    local node_bellow = airutils.nodeatpos(airutils.pos_shift(curr_pos,{y=-3}))
     local is_flying = true
     if node_bellow and node_bellow.drawtype ~= 'airlike' then is_flying = false end
     --if is_flying then minetest.chat_send_all('is flying') end
@@ -587,7 +587,7 @@ function hidroplane.flightstep(self)
     if accel == nil then accel = {x=0,y=0,z=0} end
 
     --lift calculation
-    --accel.y = accel_y --accel.y + mobkit.gravity --accel_y
+    --accel.y = accel_y --accel.y + airutils.gravity --accel_y
 
     --lets apply some bob in water
 	if self.isinliquid then

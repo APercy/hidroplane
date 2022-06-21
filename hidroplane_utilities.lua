@@ -56,7 +56,8 @@ function hidroplane.attach(self, player, instructor_mode)
     minetest.after(1, function()
         player = minetest.get_player_by_name(name)
         if player then
-	        player_api.set_animation(player, "sit")
+            airutils.sit(player)
+	        --player_api.set_animation(player, "sit")
             --apply_physics_override(player, {speed=0,gravity=0,jump=0})
         end
     end)
@@ -85,7 +86,8 @@ function hidroplane.attach_pax(self, player)
     minetest.after(1, function()
         player = minetest.get_player_by_name(name)
         if player then
-	        player_api.set_animation(player, "sit")
+            airutils.sit(player)
+	        --player_api.set_animation(player, "sit")
             --apply_physics_override(player, {speed=0,gravity=0,jump=0})
         end
     end)

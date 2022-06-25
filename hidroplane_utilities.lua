@@ -480,8 +480,9 @@ function hidroplane.flightstep(self)
     end
 
     --ajustar angulo de ataque
+    local percentage = 0
     if longit_speed then
-        local percentage = math.abs(((longit_speed * 100)/(hidroplane.min_speed + 5))/100)
+        percentage = math.abs(((longit_speed * 100)/(hidroplane.min_speed + 5))/100)
         if percentage > 1.5 then percentage = 1.5 end
         self._angle_of_attack = self._angle_of_attack - ((self._elevator_angle / 20)*percentage)
         if self._angle_of_attack < -0.5 then

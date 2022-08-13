@@ -216,6 +216,10 @@ minetest.register_entity("hidroplane:hidro", {
     _inv = nil,
     _inv_id = "",
 
+    _change_color = function(self, colstr)
+        airutils.paint(self, colstr, "hidroplane_painting.png")
+    end,
+
     get_staticdata = function(self) -- unloaded/unloads ... is now saved
         return minetest.serialize({
             --stored_sound_handle = self.sound_handle,

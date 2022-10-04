@@ -85,8 +85,8 @@ function hidroplane.physics(self)
     local vel_adjusted = 40
     local nan = (0/0)
     if new_velocity.x == nil or new_velocity.x == nan then new_velocity.x = 0 end
-    if new_velocity.z == nil or new_velocity.x == nan then new_velocity.z = 0 end
-    if new_velocity.y == nil or new_velocity.x == nan then new_velocity.y = 0 end
+    if new_velocity.z == nil or new_velocity.z == nan then new_velocity.z = 0 end
+    if new_velocity.y == nil or new_velocity.y == nan then new_velocity.y = 0 end
     if new_velocity.x > max_factor then new_velocity.x = vel_adjusted end
     if new_velocity.x < -max_factor then new_velocity.x = -vel_adjusted end
     if new_velocity.z > max_factor then new_velocity.z = vel_adjusted end

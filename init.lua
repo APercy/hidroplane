@@ -107,7 +107,7 @@ local function fetch_setting(name)
 end
 
 
-local old_entities = {"hidroplane:seat_base","hidroplane:engine","hidroplane:pointer","hidroplane:stick"}
+local old_entities = {"hidroplane:seat_base","hidroplane:engine","hidroplane:pointer","hidroplane:stick","hidroplane:front_wheels"}
 for _,entity_name in ipairs(old_entities) do
     minetest.register_entity(":"..entity_name, {
         on_activate = function(self, staticdata)

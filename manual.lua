@@ -1,10 +1,9 @@
-dofile(minetest.get_modpath("hidroplane") .. DIR_DELIM .. "hidroplane_global_definitions.lua")
 
 --------------
 -- Manual --
 --------------
 
-function hidroplane.manual_formspec(name)
+function hydroplane.manual_formspec(name)
     local basic_form = table.concat({
         "formspec_version[3]",
         "size[16,10]",

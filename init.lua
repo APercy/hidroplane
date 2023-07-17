@@ -89,6 +89,7 @@ hydroplane.plane_properties._vehicle_name = "Super Duck Hydroplane"
 hydroplane.plane_properties._custom_step_additional_function = hydroplane.step_additional_function
 hydroplane.plane_properties._register_parts_method = hydroplane.register_parts_method
 hydroplane.plane_properties._destroy_parts_method = hydroplane.destroy_parts_method
+hydroplane.plane_properties._have_manual = hydroplane.manual_formspec
 hydroplane.plane_properties.initial_properties = airutils.properties_copy(supercub.plane_properties.initial_properties)
 hydroplane.plane_properties.initial_properties.collisionbox = {-1.2, -2.3, -1.2, 1.2, 1, 1.2}
 hydroplane.plane_properties.initial_properties.selectionbox = {-2, -2.3, -2, 2, 1, 2}

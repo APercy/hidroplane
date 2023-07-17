@@ -83,7 +83,7 @@ end
 
 hydroplane.plane_properties = airutils.properties_copy(supercub.plane_properties)
 hydroplane.plane_properties._tail_angle = 0
-hydroplane.plane_properties._lift = 16
+hydroplane.plane_properties._lift = 19
 hydroplane.plane_properties.buoyancy = 0.25
 hydroplane.plane_properties._max_speed = 7.5
 hydroplane.plane_properties._speed_not_exceed = 15

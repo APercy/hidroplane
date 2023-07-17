@@ -83,8 +83,10 @@ end
 
 hydroplane.plane_properties = airutils.properties_copy(supercub.plane_properties)
 hydroplane.plane_properties._tail_angle = 0
-hydroplane.plane_properties._lift = 15
+hydroplane.plane_properties._lift = 16
 hydroplane.plane_properties.buoyancy = 0.25
+hydroplane.plane_properties._max_speed = 7.5
+hydroplane.plane_properties._speed_not_exceed = 15
 hydroplane.plane_properties._vehicle_name = "Super Duck Hydroplane"
 hydroplane.plane_properties._custom_step_additional_function = hydroplane.step_additional_function
 hydroplane.plane_properties._register_parts_method = hydroplane.register_parts_method
